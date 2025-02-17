@@ -1,20 +1,10 @@
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
 from sqlalchemy import CheckConstraint
 
-# Inicializar la aplicación Flask
-# Initializing Flask app
-app = Flask(__name__)
-
-# Configurar la base de datos SQLite
-# Configuring base sqlite info
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///spartanswap.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
 # Inicializar la extensión SQLAlchemy
 # Starting SQAlchemy
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 
 # Definir la tabla User
@@ -56,14 +46,3 @@ class Item(db.Model):
     # making sure that the price is greater than 0
     # Aplicar restricción para que el precio sea mayor a 0
     __table_args__ = (CheckConstraint("price > 0", name="check_price_positive"),)
-
-
-# Crear las tablas en la base de datos con manejo de errores
-# Making the datatables with error handling
-if __name__ == "__main__":
-    try:
-        with app.app_context():
-            db.create_all()
-            print("Base de datos creada exitosamente.")
-    except Exception as e:
-        print(f"Error al crear la base de datos: {e}")
