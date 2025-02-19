@@ -1,0 +1,499 @@
+.home-page {
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .home-page .div {
+    background-color: var(--color-background-default-default);
+    height: 1459px;
+    position: relative;
+    width: var(--responsive-device-width);
+  }
+  
+  .home-page .overlap {
+    height: 1250px;
+    left: 0;
+    position: absolute;
+    top: 96px;
+    width: 1200px;
+  }
+  
+  .home-page .overlap-group {
+    height: 1250px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 1200px;
+  }
+  
+  .home-page .rectangle {
+    background-color: #eaf5fac2;
+    height: 775px;
+    left: 0;
+    position: absolute;
+    top: 475px;
+    width: 1200px;
+  }
+  
+  .home-page .image {
+    height: 323px;
+    left: 112px;
+    position: absolute;
+    top: 560px;
+    width: 426px;
+  }
+  
+  .home-page .img {
+    height: 304px;
+    left: 108px;
+    object-fit: cover;
+    position: absolute;
+    top: 899px;
+    width: 595px;
+  }
+  
+  .home-page .cream-brown {
+    height: 500px;
+    left: 588px;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    width: 500px;
+  }
+  
+  .home-page .rectangle-2 {
+    height: 304px;
+    left: 721px;
+    object-fit: cover;
+    position: absolute;
+    top: 899px;
+    width: 409px;
+  }
+  
+  .home-page .rectangle-3 {
+    height: 323px;
+    left: 552px;
+    position: absolute;
+    top: 560px;
+    width: 578px;
+  }
+  
+  .home-page .text-wrapper {
+    color: #fafafa;
+    font-family: "Abhaya Libre ExtraBold-Regular", Helvetica;
+    font-size: 56px;
+    font-weight: 400;
+    left: 623px;
+    letter-spacing: 1.12px;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    text-shadow: 0px 2px 20px #00000066;
+    top: 659px;
+    width: 325px;
+  }
+  
+  .home-page .frame {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 28px;
+    left: 445px;
+    position: absolute;
+    top: 500px;
+    width: 249px;
+  }
+  
+  .home-page .highlights {
+    color: var(--greygrey-700);
+    font-family: "Abhaya Libre ExtraBold-Regular", Helvetica;
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: normal;
+    margin-bottom: -6.00px;
+    margin-top: -1.00px;
+    position: relative;
+    white-space: nowrap;
+    width: fit-content;
+  }
+  
+  .home-page .rectangle-4 {
+    background-color: var(--greygrey-700);
+    border-radius: 100px;
+    height: 4px;
+    margin-bottom: -19.00px;
+    position: relative;
+    width: 88px;
+  }
+  
+  .home-page .text-wrapper-2 {
+    color: #fafafa;
+    font-family: "Abhaya Libre ExtraBold-Regular", Helvetica;
+    font-size: 56px;
+    font-weight: 400;
+    left: 778px;
+    letter-spacing: 1.12px;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    text-shadow: 0px 2px 20px #00000066;
+    top: 1003px;
+    width: 325px;
+  }
+  
+  .home-page .text-wrapper-3 {
+    color: #fafafa;
+    font-family: "Abhaya Libre ExtraBold-Regular", Helvetica;
+    font-size: 56px;
+    font-weight: 400;
+    left: 174px;
+    letter-spacing: 1.12px;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    text-shadow: 0px 2px 20px #00000066;
+    top: 659px;
+    width: 325px;
+  }
+  
+  .home-page .text-wrapper-4 {
+    color: #fafafa;
+    font-family: "Abhaya Libre ExtraBold-Regular", Helvetica;
+    font-size: 56px;
+    font-weight: 400;
+    left: 248px;
+    letter-spacing: 1.12px;
+    line-height: normal;
+    position: absolute;
+    text-align: center;
+    text-shadow: 0px 2px 20px #00000066;
+    top: 986px;
+    width: 325px;
+  }
+  
+  .home-page .overlap-2 {
+    background-image: url(./cream-brown-minimalist-line-art-fashion-store-logo-4-1.png);
+    background-position: 50% 50%;
+    background-size: cover;
+    height: 379px;
+    left: 108px;
+    position: absolute;
+    top: 61px;
+    width: 358px;
+  }
+  
+  .home-page .rectangle-5 {
+    background-color: #0d1930;
+    border: 1px solid;
+    border-color: #000000;
+    border-radius: 8px;
+    height: 66px;
+    left: 45px;
+    position: absolute;
+    top: 313px;
+    width: 256px;
+  }
+  
+  .home-page .text-wrapper-5 {
+    color: #fffafa;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 32px;
+    font-weight: 400;
+    left: 90px;
+    letter-spacing: 0;
+    line-height: 32px;
+    position: absolute;
+    top: 327px;
+    white-space: nowrap;
+    width: 167px;
+  }
+  
+  .home-page .header {
+    background-color: #ffffff;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-color: #c2ddebc2;
+    border-left-style: none;
+    border-right-style: none;
+    border-top-style: none;
+    gap: var(--size-space-600);
+    height: 96px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: var(--responsive-device-width);
+  }
+  
+  .home-page .cream-brown-2 {
+    height: 96px;
+    left: 32px;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    width: 160px;
+  }
+  
+  .home-page .navigation-pill-list-instance {
+    display: flex !important;
+    gap: 10px 10px !important;
+    height: 32px !important;
+    justify-content: flex-end !important;
+    left: 204px !important;
+    position: absolute !important;
+    top: 32px !important;
+    width: 702px !important;
+  }
+  
+  .home-page .button {
+    all: unset;
+    background-color: #09143a;
+    border: 1px solid;
+    border-color: var(--color-border-brand-default);
+    border-radius: var(--size-radius-200);
+    box-sizing: border-box;
+    height: 32px;
+    left: 942px;
+    overflow: hidden;
+    position: absolute;
+    top: 32px;
+    width: 126px;
+  }
+  
+  .home-page .text-wrapper-6 {
+    color: var(--color-text-brand-on-brand);
+    font-family: var(--single-line-body-base-font-family);
+    font-size: var(--single-line-body-base-font-size);
+    font-style: var(--single-line-body-base-font-style);
+    font-weight: var(--single-line-body-base-font-weight);
+    left: 10px;
+    letter-spacing: var(--single-line-body-base-letter-spacing);
+    line-height: var(--single-line-body-base-line-height);
+    position: absolute;
+    top: 7px;
+    white-space: nowrap;
+  }
+  
+  .home-page .button-wrapper {
+    all: unset;
+    align-items: center;
+    background-color: #a6d2e6;
+    border: 1px solid;
+    border-radius: var(--size-radius-200);
+    box-sizing: border-box;
+    display: flex;
+    gap: var(--size-space-200);
+    justify-content: center;
+    left: 1092px;
+    overflow: hidden;
+    padding: var(--size-space-200);
+    position: absolute;
+    top: 32px;
+    width: 76px;
+  }
+  
+  .home-page .button-2 {
+    all: unset;
+    box-sizing: border-box;
+    color: var(--color-text-default-default);
+    font-family: var(--single-line-body-base-font-family);
+    font-size: var(--single-line-body-base-font-size);
+    font-style: var(--single-line-body-base-font-style);
+    font-weight: var(--single-line-body-base-font-weight);
+    letter-spacing: var(--single-line-body-base-letter-spacing);
+    line-height: var(--single-line-body-base-line-height);
+    margin-top: -1.00px;
+    position: relative;
+    white-space: nowrap;
+    width: fit-content;
+  }
+  
+  .home-page .features {
+    height: 85px;
+    left: 69px;
+    position: absolute;
+    top: 1362px;
+    width: 1090px;
+  }
+  
+  .home-page .features-2 {
+    height: 85px;
+    position: relative;
+  }
+  
+  .home-page .feature {
+    height: 82px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 390px;
+  }
+  
+  .home-page .overlap-group-2 {
+    height: 65px;
+    left: 76px;
+    position: absolute;
+    top: 17px;
+    width: 312px;
+  }
+  
+  .home-page .text {
+    height: 30px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 148px;
+  }
+  
+  .home-page .text-wrapper-7 {
+    color: #484848;
+    font-family: "Poppins-Medium", Helvetica;
+    font-size: 20px;
+    font-weight: 500;
+    left: 0;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 0;
+    width: 146px;
+  }
+  
+  .home-page .p {
+    color: #484848;
+    font-family: "Poppins-Regular", Helvetica;
+    font-size: 16px;
+    font-weight: 400;
+    left: 0;
+    letter-spacing: 0;
+    line-height: 26px;
+    position: absolute;
+    top: 27px;
+    width: 312px;
+  }
+  
+  .home-page .icon {
+    height: 72px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 60px;
+  }
+  
+  .home-page .feature-2 {
+    height: 76px;
+    left: 448px;
+    position: absolute;
+    top: 8px;
+    width: 292px;
+  }
+  
+  .home-page .overlap-3 {
+    height: 56px;
+    left: 60px;
+    position: absolute;
+    top: 14px;
+    width: 232px;
+  }
+  
+  .home-page .div-wrapper {
+    height: 43px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 232px;
+  }
+  
+  .home-page .text-wrapper-8 {
+    color: #484848;
+    font-family: "Poppins-Medium", Helvetica;
+    font-size: 20px;
+    font-weight: 500;
+    left: 0;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 0;
+    width: 230px;
+  }
+  
+  .home-page .text-wrapper-9 {
+    color: #484848;
+    font-family: "Poppins-Regular", Helvetica;
+    font-size: 16px;
+    font-weight: 400;
+    left: 0;
+    letter-spacing: 0;
+    line-height: 26px;
+    position: absolute;
+    top: 19px;
+    width: 152px;
+  }
+  
+  .home-page .icon-2 {
+    height: 76px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 50px;
+  }
+  
+  .home-page .feature-3 {
+    height: 77px;
+    left: 813px;
+    position: absolute;
+    top: 8px;
+    width: 277px;
+  }
+  
+  .home-page .overlap-group-wrapper {
+    height: 62px;
+    left: 70px;
+    position: absolute;
+    top: 15px;
+    width: 211px;
+  }
+  
+  .home-page .overlap-group-3 {
+    height: 62px;
+    position: relative;
+    width: 207px;
+  }
+  
+  .home-page .text-wrapper-10 {
+    color: #484848;
+    font-family: "Poppins-Medium", Helvetica;
+    font-size: 20px;
+    font-weight: 500;
+    left: 0;
+    letter-spacing: 0;
+    line-height: normal;
+    position: absolute;
+    top: 0;
+    width: 207px;
+  }
+  
+  .home-page .text-wrapper-11 {
+    color: #484848;
+    font-family: "Poppins-Regular", Helvetica;
+    font-size: 16px;
+    font-weight: 400;
+    left: 5px;
+    letter-spacing: 0;
+    line-height: 26px;
+    position: absolute;
+    top: 24px;
+    width: 152px;
+  }
+  
+  .home-page .vector {
+    height: 73px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 60px;
+  }
+  
