@@ -25,11 +25,11 @@ const HomePage = () => {
 
         {/* Center - Links */}
         <ul className="hidden md:flex flex-grow justify-center space-x-8 lg:space-x-12">
-        <li><a href="#" className="text-gray-600 hover:text-gray-900">Home</a></li>
-          <li><a href="#" className="text-gray-600 hover:text-gray-900">Home Goods</a></li>
-          <li><a href="#" className="text-gray-600 hover:text-gray-900">Clothes</a></li>
-          <li><a href="#" className="text-gray-600 hover:text-gray-900">Rental</a></li>
-          <li><a href="#" className="text-gray-600 hover:text-gray-900">Tickets</a></li>
+          <li><a href="/" className="text-gray-600 hover:text-gray-900">Home</a></li>
+          <li><a href="/homegoods" className="text-gray-600 hover:text-gray-900">Home Goods</a></li>
+          <li><a href="/clothes" className="text-gray-600 hover:text-gray-900">Clothes</a></li>
+          <li><a href="/rental" className="text-gray-600 hover:text-gray-900">Rental</a></li>
+          <li><a href="/tickets" className="text-gray-600 hover:text-gray-900">Tickets</a></li>
         </ul>
 
         {/* Right - Buttons */}
