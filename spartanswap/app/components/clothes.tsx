@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react"; 
 
 const ClothesPage = () => {
   // Sample Data (Replace with backend data)
@@ -92,8 +93,8 @@ const ClothesPage = () => {
 
       <div className="grid grid-cols-4 gap-6 max-w-7xl mx-auto px-6 mt-6">
         {/* Filters */}
-        <div className="col-span-1 bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Filters</h3>
+        <div className="col-span-1 bg-white p-4 shadow w-60 h-min rounded-md flex flex-col space-y-4">
+        <h3 className="text-lg font-semibold text-gray-700 mb-4">Filters</h3>
 
           {/* Filter: Color */}
           <div className="mb-4">
@@ -131,9 +132,9 @@ const ClothesPage = () => {
         </div>
 
         {/* Listings */}
-        <div className="col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {currentProducts.map((product) => (
-            <div key={product.id} className="border bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+        {currentProducts.map((product) => (
+            <div key={product.id} className="border bg-white rounded-md shadow-sm overflow-hidden">
               <div className="relative">
                 <Image src={product.image} alt={product.name} width={300} height={300} className="w-full h-64 object-cover"/>
                 <button className="absolute top-2 right-2 bg-white p-2 rounded-full shadow">❤️</button>
@@ -147,17 +148,37 @@ const ClothesPage = () => {
         </div>
       </div>
 
-      {/* Pagination */}
-      <div className="flex justify-center items-center mt-8 space-x-2">
-        <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} className="px-3 py-2 border rounded disabled:opacity-50">←</button>
+      <div className="flex justify-end mt-12 pb-12 max-w-7xl mx-auto">
+      <div className="flex space-x-2 items-center">
+        {/* Previous Page Button */}
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          className="px-3 py-2 border border-gray-700 rounded disabled:opacity-50 flex items-center"
+        >
+          <ChevronLeft className="w-5 h-5 text-gray-700" />
+        </button>
+
+        {/* Page Numbers */}
         {Array.from({ length: Math.ceil(products.length / itemsPerPage) }).map((_, i) => (
-          <button key={i} onClick={() => setCurrentPage(i + 1)} className={`px-3 py-2 border rounded ${currentPage === i + 1 ? "bg-blue-600 text-white" : "text-gray-600"}`}>
+          <button
+            key={i}
+            onClick={() => setCurrentPage(i + 1)}
+            className={`px-3 py-2 border rounded ${currentPage === i + 1 ? "bg-blue-600 text-white" : "text-gray-600"}`}
+          >
             {i + 1}
           </button>
         ))}
-        <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(products.length / itemsPerPage)))} className="px-3 py-2 border rounded disabled:opacity-50">→</button>
+
+        {/* Next Page Button */}
+        <button
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(products.length / itemsPerPage)))}
+          className="px-3 py-2 border border-gray-700 rounded disabled:opacity-50 flex items-center"
+        >
+          <ChevronRight className="w-5 h-5 text-gray-700" />
+        </button>
       </div>
     </div>
+  </div>
   );
 };
 

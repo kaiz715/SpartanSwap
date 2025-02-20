@@ -1,5 +1,5 @@
-import TicketsPage from "@/app/components/tickets";
+import TicketPage from "@/app/components/tickets";
 
 export default function Page() {
-  return <TicketsPage />;
+  return <TicketPage />;
 }
