@@ -4,9 +4,11 @@ import Image from "next/image";
 import Link from "next/link"; 
 import React from 'react';
 import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 
 const HomePage = () => {
+  const pathname = usePathname(); 
   return (
     <div className="bg-white">
       {/* Navbar */}
@@ -32,12 +34,27 @@ const HomePage = () => {
 
         {/* Center - Links */}
         <ul className="hidden md:flex flex-grow justify-center space-x-8 lg:space-x-12">
-          <li><Link href="/" className="text-gray-600 hover:text-gray-900">Home</Link></li>
-          <li><Link href="/homegoods" className="text-gray-600 hover:text-gray-900">Home Goods</Link></li>
-          <li><Link href="/clothes" className="text-gray-600 hover:text-gray-900">Clothes</Link></li>
-          <li><Link href="/rental" className="text-gray-600 hover:text-gray-900">Rental</Link></li>
-          <li><Link href="/tickets" className="text-gray-600 hover:text-gray-900">Tickets</Link></li>
-        </ul>
+        {[
+          { name: "Home", href: "/" },
+          { name: "Home Goods", href: "/homegoods" },
+          { name: "Clothes", href: "/clothes" },
+          { name: "Rental", href: "/rental" },
+          { name: "Tickets", href: "/tickets" },
+        ].map((tab) => (
+          <li key={tab.href}>
+            <Link
+              href={tab.href}
+              className={`px-4 py-2 transition-all ${
+                pathname === tab.href
+                ? "bg-blue-100 text-blue-900 font-bold px-4 py-2 rounded-md"
+                : "text-gray-600 hover:text-gray-900 px-4 py-2"
+              }`}
+            >
+              {tab.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
 
         {/* Right - Buttons */}
         <div className="flex space-x-4">

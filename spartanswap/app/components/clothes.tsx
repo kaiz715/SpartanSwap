@@ -4,8 +4,10 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react"; 
+import { usePathname } from "next/navigation";
 
 const ClothesPage = () => {
+  const pathname = usePathname(); 
   // Sample Data (Replace with backend data)
   const allProducts = Array.from({ length: 50 }, (_, i) => ({
     id: i + 1,
@@ -63,14 +65,29 @@ const ClothesPage = () => {
           </Link>
         </div>
 
-        {/* Center - Links */}
+          {/* Center - Links */}
         <ul className="hidden md:flex flex-grow justify-center space-x-8 lg:space-x-12">
-          <li><a href="/" className="text-gray-600 hover:text-gray-900">Home</a></li>
-          <li><a href="/homegoods" className="text-gray-600 hover:text-gray-900">Home Goods</a></li>
-          <li><a href="/clothes" className="text-gray-600 hover:text-gray-900">Clothes</a></li>
-          <li><a href="/rental" className="text-gray-600 hover:text-gray-900">Rental</a></li>
-          <li><a href="/tickets" className="text-gray-600 hover:text-gray-900">Tickets</a></li>
-        </ul>
+        {[
+          { name: "Home", href: "/" },
+          { name: "Home Goods", href: "/homegoods" },
+          { name: "Clothes", href: "/clothes" },
+          { name: "Rental", href: "/rental" },
+          { name: "Tickets", href: "/tickets" },
+        ].map((tab) => (
+          <li key={tab.href}>
+            <Link
+              href={tab.href}
+              className={`px-4 py-2 transition-all ${
+                pathname === tab.href
+                ? "bg-blue-100 text-blue-900 font-bold px-4 py-2 rounded-md"
+                : "text-gray-600 hover:text-gray-900 px-4 py-2"
+              }`}
+            >
+              {tab.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
 
         {/* Right - Buttons */}
         <div className="flex space-x-4">
@@ -99,7 +116,7 @@ const ClothesPage = () => {
           {/* Filter: Color */}
           <div className="mb-4">
             <h4 className="text-gray-600 font-medium">Color</h4>
-            <select className="w-full border p-2 rounded mt-2 bg-gray-100" onChange={(e) => handleFilterChange("color", e.target.value)}>
+            <select className="w-full border p-2 text-gray-800 rounded mt-2 bg-gray-100" onChange={(e) => handleFilterChange("color", e.target.value)}>
               <option value="">All</option>
               <option value="Red">Red</option>
               <option value="Blue">Blue</option>
@@ -113,7 +130,7 @@ const ClothesPage = () => {
           {/* Filter: Type */}
           <div className="mb-4">
             <h4 className="text-gray-600 font-medium">Type</h4>
-            <select className="w-full border p-2 rounded mt-2 bg-gray-100" onChange={(e) => handleFilterChange("type", e.target.value)}>
+            <select className="w-full border p-2 rounded text-gray-800 mt-2 bg-gray-100" onChange={(e) => handleFilterChange("type", e.target.value)}>
               <option value="">All</option>
               <option value="Furniture">Furniture</option>
               <option value="Decor">Decor</option>
