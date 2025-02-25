@@ -33,31 +33,35 @@ class DBClass:
             self.db.session.commit()
             print(f"Usuario {name} agregado correctamente.")
 
-    def add_item(self, seller_id, item_type, color, price, condition):
-        """Método para agregar un ítem a la base de datos"""
+    def add_item(self, seller_id, item_type, color, price, condition, image_url=None):
+        """Method to add an item to the database"""
         with self.app.app_context():
-            new_item = Item(seller_id=seller_id, item_type=item_type, color=color, price=price, condition=condition)
+            new_item = Item(seller_id=seller_id, item_type=item_type, color=color, price=price, condition=condition, image_url=image_url)
             self.db.session.add(new_item)
             self.db.session.commit()
             print(f"Ítem {item_type} agregado correctamente.")
 
-# Define the database models
-class User(DBClass.db.Model):
-    id = DBClass.db.Column(DBClass.db.Integer, primary_key=True)
-    profile_picture = DBClass.db.Column(DBClass.db.String(255), nullable=True)
-    email = DBClass.db.Column(DBClass.db.String(100), unique=True, nullable=False)
-    name = DBClass.db.Column(DBClass.db.String(100), nullable=False)
-    account_create_date = DBClass.db.Column(DBClass.db.DateTime, default=datetime.utcnow)
 
-    items = DBClass.db.relationship('Item', backref='seller', lazy=True)
+db = DBClass.db
 
-class Item(DBClass.db.Model):
-    id = DBClass.db.Column(DBClass.db.Integer, primary_key=True)
-    date = DBClass.db.Column(DBClass.db.DateTime, default=lambda: datetime.now(timezone.utc))
-    seller_id = DBClass.db.Column(DBClass.db.Integer, DBClass.db.ForeignKey('user.id'), nullable=False)
-    item_type = DBClass.db.Column(DBClass.db.String(50), nullable=False)
-    color = DBClass.db.Column(DBClass.db.String(50), nullable=True)
-    price = DBClass.db.Column(DBClass.db.Float, nullable=False)
-    condition = DBClass.db.Column(DBClass.db.String(50), nullable=False)
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    profile_picture = db.Column(db.String(255), nullable=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    account_create_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    items = db.relationship('Item', backref='seller', lazy=True)
+
+class Item(db.Model):
+    __tablename__ = 'item'
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    item_type = db.Column(db.String(50), nullable=False)
+    color = db.Column(db.String(50), nullable=True)
+    price = db.Column(db.Float, nullable=False)
+    condition = db.Column(db.String(50), nullable=False)
+    image_url = db.Column(db.String(255), nullable=True)
 
     __table_args__ = (CheckConstraint('price > 0', name='check_price_positive'),)
