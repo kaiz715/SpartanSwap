@@ -1,4 +1,4 @@
-from db_manager import DBClass, User
+from db_class import DBClass, User
 
 db = DBClass.create_new()
 
@@ -18,7 +18,13 @@ with db.app.app_context():
 
     # Now that the user exists, add an item
     if seller:
-        db.add_item(seller_id=seller.id, item_type="iPad", color="White", price=250.0, condition="Used")
+        db.add_item(
+            seller_id=seller.id,
+            item_type="iPad",
+            color="White",
+            price=250.0,
+            condition="Used",
+        )
         print("Item successfully added.")
     else:
         print("Error: Could not retrieve the user after creation.")
