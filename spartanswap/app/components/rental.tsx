@@ -70,7 +70,7 @@ const RentalPage = () => {
     }
     setProducts(filtered);
     setCurrentPage(1);
-  }, [filters, allProducts]);
+  }, [filters]);
 
 
   return (
