@@ -5,6 +5,8 @@ import Link from "next/link";
 import React from 'react';
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
+import signInWithGooglee from "@/app/components/signin";
+import MyComponent from "./MyComponent";
 
 
 const HomePage = () => {
@@ -61,9 +63,12 @@ const HomePage = () => {
     <button className="border border-blue-600 text-blue-600 px-2 py-1 lg:px-4 lg:py-2 rounded text-sm lg:text-base hover:bg-blue-50">
       Create Listing
     </button>
-    <button className="bg-blue-600 text-white px-2 py-1 lg:px-4 lg:py-2 rounded text-sm lg:text-base hover:bg-blue-700">
+
+    <MyComponent />
+
+    {/* <button className="bg-blue-600 text-white px-2 py-1 lg:px-4 lg:py-2 rounded text-sm lg:text-base hover:bg-blue-700">
       Sign In
-    </button>
+    </button> */}
   </div>
 </motion.nav>
       

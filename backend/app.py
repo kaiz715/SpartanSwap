@@ -21,14 +21,12 @@ app.secret_key = os.urandom(24)
 # client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 # Configure CORS
-CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
+CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
 
 # Configurar la base de datos SQLite
 # Configuring base sqlite info
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///spartanswap.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-db.init_app(app)
 
 @app.route("/")
 def hello_world():
@@ -69,9 +67,6 @@ def signin():
 # Making the datatables with error handling
 if __name__ == "__main__":
     try:
-        with app.app_context():
-            db.create_all()
-            print("Base de datos creada exitosamente.")
         app.run(port=5001, debug=True)
     except Exception as e:
         print(f"Error al crear la base de datos: {e}")
