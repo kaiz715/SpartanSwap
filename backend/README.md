@@ -12,5 +12,8 @@ create a virtual environment
 activating virtual environment (for macos/linux, different on windows a bit but idk off the top of my head)
 `source .venv/bin/activate`
 
+install required modules
+`pip install -r requirements.txt`
+
 finally run the app (terminal will just be running, leave it)
 `python3 app.py`
