@@ -5,6 +5,7 @@ import axios from 'axios'
 import { CookiesProvider, useCookies } from 'react-cookie'
 
 import './App.css'
+// import PostItem from './PostItem'
 
 function App() {
   const [loading, setLoading] = useState(false)
@@ -50,6 +51,7 @@ function App() {
         data-size="large"
         data-logo_alignment="left">
       </div>
+      {/* <PostItem />*/}
     </>
   )
 }
