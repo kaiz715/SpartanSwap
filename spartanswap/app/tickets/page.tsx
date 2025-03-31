@@ -1,5 +1,5 @@
-import TicketPage from "@/app/components/tickets";
+import ListingsPage from "@/app/components/ListingsPage";
 
-export default function Page() {
-  return <TicketPage />;
+export default function TicketsPage() {
+  return <ListingsPage currentCategory="Tickets" />;
 }

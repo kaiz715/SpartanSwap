@@ -1,5 +1,5 @@
-import HomeGoodsPage from "@/app/components/homegoods"; 
+import ListingsPage from "@/app/components/ListingsPage";
 
-export default function Page() {
-  return <HomeGoodsPage />;
+export default function HomeGoodsPage() {
+  return <ListingsPage currentCategory="Home Goods" />;
 }

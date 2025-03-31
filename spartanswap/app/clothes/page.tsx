@@ -1,5 +1,5 @@
-import ClothesPage from "@/app/components/clothes";
+import ListingsPage from "@/app/components/ListingsPage";
 
-export default function Page() {
-  return <ClothesPage />;
+export default function ClothesPage() {
+  return <ListingsPage currentCategory="Clothes" />;
 }

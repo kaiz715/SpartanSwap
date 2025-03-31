@@ -1,5 +1,5 @@
-import RentalPage from "@/app/components/rental";
+import ListingsPage from "@/app/components/ListingsPage";
 
-export default function Page() {
-  return <RentalPage />;
+export default function RentalPage() {
+  return <ListingsPage currentCategory="Rental" />;
 }
