@@ -53,6 +53,14 @@ export default function ProductDetailClient({ id }: { id: string }) {
 
   const isFavorited = product ? favorites.some((fav) => fav.id === product.id) : false;
 
+  // Map product category to its listing URL.
+  const categoryToUrl: Record<string, string> = {
+    "Home Goods": "/homegoods",
+    "Clothes": "/clothes",
+    "Tickets": "/tickets",
+    "Rental": "/rental",
+  };
+
   if (!product) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
@@ -186,6 +194,16 @@ export default function ProductDetailClient({ id }: { id: string }) {
               <button className="w-full bg-blue-600 text-white px-3 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
                 Contact Seller
               </button>
+            </div>
+
+            {/* Back to Listings Button */}
+            <div className="mt-4">
+              <Link
+                href={categoryToUrl[product.category] || "/"}
+                className="w-full inline-block bg-gray-300 text-black px-3 py-3 rounded-lg font-semibold hover:bg-gray-400 transition text-center"
+              >
+                Back to Listings
+              </Link>
             </div>
           </div>
         </div>

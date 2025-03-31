@@ -3,7 +3,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react';
 import { CookiesProvider, useCookies } from 'react-cookie'
 
-export default function signInWithGoogle() {
+export default function SignInWithGoogle() {
   const [loading, setLoading] = useState(false)
   const [cookies, setCookie] = useCookies(['jwt_token'])
 
@@ -14,9 +14,10 @@ export default function signInWithGoogle() {
       bodyFormData.append('credential', response.credential);
       axios.post('http://localhost:5001/signin', bodyFormData)
       .then(JWTresponse => {
+        console.log("Backend response:", JWTresponse.data);
         if (JWTresponse.data.CWRU_validated) {
           console.log('Logged in')
-          setCookie('jwt_token', JWTresponse.data.jwt_token)
+          setCookie('jwt_token', JWTresponse.data.jwt_token, { path: '/' });
         }
         else{
           console.log('Not logged in')

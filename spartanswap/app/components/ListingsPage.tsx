@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/app/components/Navbar";
@@ -73,7 +73,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
     },
   ];
 
-  // Global listings state (holds products from all categories).
+  // Global listings state.
   const [listings, setListings] = useState<Product[]>([]);
   // Filtered products to display.
   const [products, setProducts] = useState<Product[]>([]);
@@ -88,43 +88,32 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
     type: string;
     price: number[];
   }>({
-    // Added a category filter with the currentCategory as default.
     category: currentCategory,
     color: "",
     type: "",
     price: [0, 300],
-  });
-  
-
-  // State for showing the create listing modal.
-  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
-
-  // State for new listing form data.
-  const [newListing, setNewListing] = useState<{
-    photo: File | null;
-    photoURL: string;
-    title: string;
-    description: string;
-    price: string;
-    type: string;
-    category: string;
-    color: string;
-  }>({
-    photo: null,
-    photoURL: "",
-    title: "",
-    description: "",
-    price: "",
-    type: "",
-    category: currentCategory,
-    color: "",
   });
 
   const itemsPerPage = 9;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-  // --- LOCAL STORAGE PERSISTENCE ---
+  // Listen for custom listings update events dispatched from Navbar.
+  useEffect(() => {
+    const updateListings = () => {
+      const data = localStorage.getItem("listings");
+      if (data) {
+        setListings(JSON.parse(data));
+      }
+    };
+
+    window.addEventListener("listingsUpdated", updateListings);
+    return () => {
+      window.removeEventListener("listingsUpdated", updateListings);
+    };
+  }, []);
+
+  // Load listings on mount.
   useEffect(() => {
     const data = localStorage.getItem("listings");
     if (data) {
@@ -136,6 +125,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Persist listings to localStorage on changes.
   useEffect(() => {
     localStorage.setItem("listings", JSON.stringify(listings));
   }, [listings]);
@@ -147,7 +137,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
       return isFavorited ? prev.filter((fav) => fav.id !== item.id) : [...prev, item];
     });
   };
-  
+
   useEffect(() => {
     const favData = localStorage.getItem("favorites");
     if (favData) {
@@ -163,7 +153,10 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
   useEffect(() => {
     let filtered = listings;
     if (filters.category && filters.category !== "All") {
-      filtered = filtered.filter((p) => p.category === filters.category);
+      filtered = filtered.filter(
+        (p) =>
+          p.category.toLowerCase() === filters.category.toLowerCase()
+      );
     }
     if (filters.color) {
       filtered = filtered.filter((p) => p.color === filters.color);
@@ -181,77 +174,25 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
   }, [filters, listings]);
   
 
-
-  // --- HANDLERS ---
-  // For filter changes.
   const handleFilterChange = (key: keyof typeof filters, value: string | number[]) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
-  };
-
-  // For file uploads.
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const photoURL = URL.createObjectURL(file);
-      setNewListing((prev) => ({ ...prev, photo: file, photoURL }));
-    }
-  };
-
-  // For form input changes.
-  const handleFormChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    if (name === "category") {
-      setNewListing((prev) => ({ ...prev, [name]: value, type: "" }));
-    } else {
-      setNewListing((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  // For adding a new listing.
-  const handleAddListing = (e: FormEvent) => {
-    e.preventDefault();
-    const product: Product = {
-      id: Date.now(),
-      name: newListing.title,
-      price: Number(newListing.price),
-      orders: 0,
-      image: newListing.photoURL || "/placeholder.jpg",
-      type: newListing.type,
-      color: newListing.color,
-      category: newListing.category,
-      description: newListing.description,
-      isCustom: true,
-    };
-    setListings((prev) => [...prev, product]);
-    setNewListing({
-      photo: null,
-      photoURL: "",
-      title: "",
-      description: "",
-      price: "",
-      type: "",
-      category: currentCategory,
-      color: "",
-    });
-    setShowCreateModal(false);
   };
 
   const currentProducts = products.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <div className="bg-[#EAF5FA] min-h-screen relative">
-      {/* Navbar */}
+      {/* Navbar is rendered at the top; create listing functionality is now centralized in Navbar */}
       <div className="sticky top-0 z-50">
-        <Navbar/>
+        <Navbar />
       </div>
 
       {/* Product Count */}
       <div className="flex justify-between items-center mt-6 px-6">
         <h2 className="text-2xl font-bold text-gray-700">{currentCategory}</h2>
         <p className="text-gray-600">
-          Showing {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, products.length)} out of {products.length} Products
+          Showing {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, products.length)} out of{" "}
+          {products.length} Products
         </p>
       </div>
 
@@ -269,17 +210,24 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
               id="filter-color"
               aria-label="Filter by color"
               className="w-full border text-gray-800 p-2 rounded mt-2 bg-gray-100"
-              onChange={(e) => handleFilterChange("color", e.target.value)}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                handleFilterChange("color", e.target.value)
+              }
             >
               <option value="">All</option>
               <option value="Green">Green</option>
               <option value="Brown">Brown</option>
+              <option value="Gray">Gray</option>
               <option value="Blue">Blue</option>
               <option value="Red">Red</option>
               <option value="Black">Black</option>
               <option value="White">White</option>
               <option value="Yellow">Yellow</option>
               <option value="Orange">Orange</option>
+              <option value="Purple">Purple</option>
+              <option value="Beige">Beige</option>
+              <option value="Cream">Cream</option>
+              <option value="Multi-Color">Multi-Color</option>
             </select>
           </div>
           {/* Filter: Type */}
@@ -291,7 +239,9 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
               id="filter-type"
               aria-label="Filter by type"
               className="w-full border p-2 rounded text-gray-800 mt-2 bg-gray-100"
-              onChange={(e) => handleFilterChange("type", e.target.value)}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                handleFilterChange("type", e.target.value)
+              }
             >
               <option value="">All</option>
               {typeOptions[currentCategory]?.map((option) => (
@@ -313,7 +263,9 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
               max="300"
               aria-label="Price range"
               className="w-full mt-2"
-              onChange={(e) => handleFilterChange("price", [0, Number(e.target.value)])}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                handleFilterChange("price", [0, Number(e.target.value)])
+              }
             />
             <p className="text-gray-500 mt-1">
               ${filters.price[0]} - ${filters.price[1]}
@@ -448,168 +400,6 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
             <p className="text-gray-700 text-sm">No items favorited yet.</p>
           )}
         </motion.div>
-      )}
-
-      {/* Create Listing Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <motion.div
-            className="bg-white p-6 rounded-md w-full max-w-md text-black"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <h2 className="text-xl font-bold mb-4">Create Listing</h2>
-            <form onSubmit={handleAddListing} className="space-y-4">
-              {/* Photo Upload */}
-              <div>
-                <label htmlFor="photo" className="block mb-1">
-                  Photo Upload
-                </label>
-                <input
-                  id="photo"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="w-full border p-2 rounded"
-                />
-                {newListing.photoURL && (
-                  <Image
-                    src={newListing.photoURL}
-                    alt="Uploaded preview"
-                    width={100}
-                    height={100}
-                    className="mt-2 object-cover"
-                  />
-                )}
-              </div>
-              {/* Title */}
-              <div>
-                <label htmlFor="title" className="block mb-1">
-                  Title
-                </label>
-                <input
-                  id="title"
-                  type="text"
-                  name="title"
-                  value={newListing.title}
-                  onChange={handleFormChange}
-                  placeholder="Enter title"
-                  className="w-full border p-2 rounded"
-                  required
-                />
-              </div>
-              {/* Description */}
-              <div>
-                <label htmlFor="description" className="block mb-1">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={newListing.description}
-                  onChange={handleFormChange}
-                  placeholder="Enter description"
-                  className="w-full border p-2 rounded"
-                  required
-                />
-              </div>
-              {/* Price */}
-              <div>
-                <label htmlFor="price" className="block mb-1">
-                  Price
-                </label>
-                <input
-                  id="price"
-                  type="number"
-                  name="price"
-                  value={newListing.price}
-                  onChange={handleFormChange}
-                  placeholder="Enter price"
-                  className="w-full border p-2 rounded"
-                  required
-                />
-              </div>
-              {/* Category */}
-              <div>
-                <label htmlFor="category" className="block mb-1">
-                  Category
-                </label>
-                <select
-                  id="category"
-                  name="category"
-                  value={newListing.category}
-                  onChange={handleFormChange}
-                  className="w-full border p-2 rounded"
-                  required
-                >
-                  <option value="Home Goods">Home Goods</option>
-                  <option value="Clothes">Clothes</option>
-                  <option value="Tickets">Tickets</option>
-                  <option value="Rental">Rental</option>
-                </select>
-              </div>
-              {/* Type */}
-              <div>
-                <label htmlFor="type" className="block mb-1">
-                  Type
-                </label>
-                <select
-                  id="type"
-                  name="type"
-                  value={newListing.type}
-                  onChange={handleFormChange}
-                  className="w-full border p-2 rounded"
-                  required
-                >
-                  <option value="">Select type</option>
-                  {(typeOptions[newListing.category] || []).map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {/* Color */}
-              <div>
-                <label htmlFor="color" className="block mb-1">
-                  Color
-                </label>
-                <select
-                  id="color"
-                  name="color"
-                  value={newListing.color}
-                  onChange={handleFormChange}
-                  className="w-full border p-2 rounded"
-                  required
-                >
-                  <option value="">Select color</option>
-                  <option value="Green">Green</option>
-                  <option value="Brown">Brown</option>
-                  <option value="Blue">Blue</option>
-                  <option value="Red">Red</option>
-                  <option value="Black">Black</option>
-                  <option value="White">White</option>
-                  <option value="Yellow">Yellow</option>
-                  <option value="Orange">Orange</option>
-                </select>
-              </div>
-              {/* Buttons */}
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 bg-gray-300 rounded"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
-                  Add
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        </div>
       )}
     </div>
   );
