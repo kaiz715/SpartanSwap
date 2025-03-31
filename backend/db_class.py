@@ -39,7 +39,17 @@ class DBClass:
             self.db.session.commit()
             print(f"Usuario {name} agregado correctamente.")
 
-    def add_item(self, seller_id, item_type, color, price, condition, image_url=None):
+    def add_item(
+        self,
+        seller_id,
+        item_type,
+        color,
+        price,
+        condition,
+        name,
+        image_url=None,
+        orders=0,
+    ):
         """Method to add an item to the database"""
         with self.app.app_context():
             new_item = Item(
@@ -49,10 +59,12 @@ class DBClass:
                 price=price,
                 condition=condition,
                 image_url=image_url,
+                name=name,
+                orders=orders,
             )
             self.db.session.add(new_item)
             self.db.session.commit()
-            print(f"Ítem {item_type} agregado correctamente.")
+            print(f"Ítem {name} agregado correctamente.")
 
     def get_all_items(self):
         """Method to retrieve all items from the database"""
@@ -84,5 +96,8 @@ class Item(db.Model):
     price = db.Column(db.Float, nullable=False)
     condition = db.Column(db.String(50), nullable=False)
     image_url = db.Column(db.String(255), nullable=True)
+    # New fields
+    name = db.Column(db.String(255), nullable=False)
+    orders = db.Column(db.Integer, default=0)
 
     __table_args__ = (CheckConstraint("price > 0", name="check_price_positive"),)

@@ -1,17 +1,19 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
 import axios from 'axios'
+import { useState } from 'react';
 import { CookiesProvider, useCookies } from 'react-cookie'
 
-import './App.css'
-// import PostItem from './PostItem'
+declare global {
+  interface Window {
+    signIn: (response: { credential: string | Blob }) => void;
+  }
+}
 
-function App() {
+export default function MyComponent() {
   const [loading, setLoading] = useState(false)
   const [cookies, setCookie] = useCookies(['jwt_token'])
 
-  window.signIn = function(response){
+  window.signIn = function(response: { credential: string | Blob }){
     setLoading(true)
     var bodyFormData = new FormData();
     bodyFormData.append('credential', response.credential);
@@ -33,7 +35,7 @@ function App() {
   }
 
   return (
-    <>
+    <div>
       <script src="https://accounts.google.com/gsi/client" async></script>
       <div id="g_id_onload"
         data-client_id="435330253471-vga9r129els35fsddcpgegesjtac5d1d.apps.googleusercontent.com"
@@ -51,9 +53,6 @@ function App() {
         data-size="large"
         data-logo_alignment="left">
       </div>
-      {/* <PostItem />*/}
-    </>
+    </div>
   )
 }
-
-export default App
