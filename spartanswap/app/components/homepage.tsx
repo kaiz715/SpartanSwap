@@ -37,10 +37,10 @@ const HomePage = () => {
                 <ul className="hidden md:flex flex-grow justify-center">
                     {[
                         { name: "Home", href: "/" },
-                        /* { name: "Home Goods", href: "/homegoods" }, */
+                        { name: "Home Goods", href: "/homegoods" },
                         { name: "Clothes", href: "/clothes" },
-                        /* { name: "Rental", href: "/rental" },
-      { name: "Tickets", href: "/tickets" }, */
+                        { name: "Rental", href: "/rental" },
+                        { name: "Tickets", href: "/tickets" },
                     ].map((tab) => (
                         <li key={tab.href}>
                             <Link
@@ -64,10 +64,7 @@ const HomePage = () => {
                     </button>
 
                     <MyComponent />
-
-                    {/* <button className="bg-blue-600 text-white px-2 py-1 lg:px-4 lg:py-2 rounded text-sm lg:text-base hover:bg-blue-700">
-      Sign In
-    </button> */}
+                    {/* You can include other sign in buttons or actions here */}
                 </div>
             </motion.nav>
 
