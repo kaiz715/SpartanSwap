@@ -119,6 +119,7 @@ export default function Navbar() {
     const listings = existingListings ? JSON.parse(existingListings) : [];
     listings.push(product);
     localStorage.setItem("listings", JSON.stringify(listings));
+    console.log("Updated listings:", JSON.parse(localStorage.getItem("listings") || "[]"));
     // Dispatch a custom event to notify other parts of the app.
     window.dispatchEvent(new Event("listingsUpdated"));
 

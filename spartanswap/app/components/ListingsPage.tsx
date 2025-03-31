@@ -102,28 +102,38 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
   useEffect(() => {
     const updateListings = () => {
       const data = localStorage.getItem("listings");
-      if (data) {
-        setListings(JSON.parse(data));
+      console.log("updateListings data:", data);
+      if (data && data !== "null" && data !== "undefined") {
+        try {
+          const parsed = JSON.parse(data);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setListings(parsed);
+          } else {
+            // If the array is empty, initialize with sampleProducts.
+            setListings(sampleProducts);
+            localStorage.setItem("listings", JSON.stringify(sampleProducts));
+          }
+        } catch (error) {
+          console.error("Error parsing listings from localStorage", error);
+          setListings(sampleProducts);
+          localStorage.setItem("listings", JSON.stringify(sampleProducts));
+        }
+      } else {
+        setListings(sampleProducts);
+        localStorage.setItem("listings", JSON.stringify(sampleProducts));
       }
     };
-
+  
+    // Run updateListings on mount.
+    updateListings();
+  
+    // Listen for custom "listingsUpdated" events.
     window.addEventListener("listingsUpdated", updateListings);
     return () => {
       window.removeEventListener("listingsUpdated", updateListings);
     };
   }, []);
-
-  // Load listings on mount.
-  useEffect(() => {
-    const data = localStorage.getItem("listings");
-    if (data) {
-      setListings(JSON.parse(data));
-    } else {
-      setListings(sampleProducts);
-      localStorage.setItem("listings", JSON.stringify(sampleProducts));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  
 
   // Persist listings to localStorage on changes.
   useEffect(() => {
