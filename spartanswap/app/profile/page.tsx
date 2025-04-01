@@ -4,6 +4,8 @@ import { useCookies } from "react-cookie";
 import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
+import { useEffect } from "react";
+import axios from "axios";
 
 export default function ProfilePage() {
   const [cookies] = useCookies(["jwt_token"]);
@@ -25,6 +27,24 @@ export default function ProfilePage() {
       setNewEmail("");
     }
   };
+
+  const loadProfile = async () => {
+    axios.get("http://localhost:5001/api/user", { withCredentials: true })
+      .then(response => {
+        if (response.data.error) {
+          console.error("Error fetching profile data:", response.data.error);
+        }
+        else{
+          setFullName(response.data.name);
+          setEmailAddresses([response.data.email]);
+        }
+        
+      })
+    }
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
 
   // If user isn't logged in, optionally redirect or show a message
   if (!isLoggedIn) {
