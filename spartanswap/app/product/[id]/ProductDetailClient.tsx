@@ -5,25 +5,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Heart } from "lucide-react";
+import { Heart, X } from "lucide-react";
+import { useFavorites } from "@/app/components/FavoritesContext";
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  orders: number;
-  image: string;
-  type: string;
-  color: string;
-  category: string;
-  description?: string;
-  isCustom?: boolean;
-}
-
+export interface Product {
+    id: number;
+    name: string;
+    price: number;
+    orders: number;
+    image: string;
+    type: string;
+    color: string;
+    category: string;
+    description?: string;
+    isCustom?: boolean;
+  }
+  
 export default function ProductDetailClient({ id }: { id: string }) {
   const pathname = usePathname();
   const [product, setProduct] = useState<Product | null>(null);
-  const [favorites, setFavorites] = useState<Product[]>([]);
+  const { favorites, toggleFavorite } = useFavorites();
+  const [showFavorites, setShowFavorites] = useState<boolean>(false);
 
   useEffect(() => {
     const data = localStorage.getItem("listings");
@@ -32,33 +34,15 @@ export default function ProductDetailClient({ id }: { id: string }) {
       const found = listings.find((p) => p.id === Number(id));
       setProduct(found || null);
     }
-    const favData = localStorage.getItem("favorites");
-    if (favData) {
-      setFavorites(JSON.parse(favData));
-    }
   }, [id]);
-
-  useEffect(() => {
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-  }, [favorites]);
-
-  const toggleFavorite = (item: Product) => {
-    setFavorites((prev) => {
-      const isFavorited = prev.some((fav) => fav.id === item.id);
-      return isFavorited
-        ? prev.filter((fav) => fav.id !== item.id)
-        : [...prev, item];
-    });
-  };
 
   const isFavorited = product ? favorites.some((fav) => fav.id === product.id) : false;
 
-  // Map product category to its listing URL.
   const categoryToUrl: Record<string, string> = {
     "Home Goods": "/homegoods",
-    "Clothes": "/clothes",
-    "Tickets": "/tickets",
-    "Rental": "/rental",
+    Clothes: "/clothes",
+    Tickets: "/tickets",
+    Rental: "/rental",
   };
 
   if (!product) {
@@ -73,7 +57,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
   }
 
   return (
-    <div className="bg-[#EAF5FA] min-h-screen">
+    <div className="bg-[#EAF5FA] min-h-screen relative">
       {/* Navbar */}
       <motion.nav
         className="flex items-center justify-between px-4 h-16 border-b bg-white"
@@ -125,7 +109,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
         </div>
       </motion.nav>
 
-      {/* Main Content in Transparent White Box */}
+      {/* Main Product Detail Content */}
       <div className="max-w-6xl mx-auto py-12 px-4">
         <div className="bg-white/50 p-6 rounded-lg shadow-lg flex flex-col sm:flex-row">
           {/* Left: Product Image */}
@@ -147,7 +131,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
 
           {/* Right: Product Details */}
           <div className="w-full sm:w-1/2 mt-8 sm:mt-0 sm:ml-8 flex flex-col space-y-4">
-            {/* Top Right Favorite Icon */}
+            {/* Favorite Icon */}
             <div className="flex justify-end">
               <button
                 onClick={() => toggleFavorite(product)}
@@ -208,6 +192,47 @@ export default function ProductDetailClient({ id }: { id: string }) {
           </div>
         </div>
       </div>
+
+      {/* Floating Favorites Button */}
+      <motion.button
+        onClick={() => setShowFavorites((prev) => !prev)}
+        aria-label="Toggle favorites sidebar"
+        className="fixed bottom-8 right-12 bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-blue-700 transition z-10"
+        whileTap={{ scale: 0.9 }}
+      >
+        {showFavorites ? "Close Favorites" : `Favorites (${favorites.length})`}
+      </motion.button>
+
+      {/* Favorites Sidebar */}
+      {showFavorites && (
+        <motion.div
+          className="fixed bottom-20 right-6 bg-white p-4 shadow-lg rounded-lg w-64 z-50"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+        >
+          <div className="flex justify-between items-center border-b pb-2 mb-2">
+            <h3 className="text-lg text-gray-700 font-bold">Favorites</h3>
+            <button onClick={() => setShowFavorites(false)} aria-label="Close favorites">
+              <X className="w-5 h-5 text-gray-700 hover:text-gray-700" />
+            </button>
+          </div>
+          {favorites.length > 0 ? (
+            <ul>
+              {favorites.map((fav) => (
+                <li key={fav.id} className="flex text-gray-700 text-sm justify-between items-center p-2 border-b">
+                  <span>{fav.name}</span>
+                  <button onClick={() => toggleFavorite(fav)} aria-label="Remove favorite">
+                    <X className="w-4 h-4 text-red-500 hover:text-red-900" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-700 text-sm">No favorites yet.</p>
+          )}
+        </motion.div>
+      )}
     </div>
   );
 }

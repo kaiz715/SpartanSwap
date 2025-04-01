@@ -7,8 +7,8 @@ import Navbar from "@/app/components/Navbar";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Heart, X } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useFavorites } from "@/app/components/FavoritesContext";
 
-// Define the Product interface.
 export interface Product {
   id: number;
   name: string;
@@ -22,7 +22,6 @@ export interface Product {
   isCustom?: boolean;
 }
 
-// Mapping for category-specific type options.
 export const typeOptions: Record<string, string[]> = {
   "Home Goods": [
     "Decor",
@@ -44,8 +43,9 @@ interface ListingsPageProps {
 
 export default function ListingsPage({ currentCategory }: ListingsPageProps) {
   const pathname = usePathname();
+  const { favorites, toggleFavorite } = useFavorites();
 
-  // Sample products (used if no data exists in localStorage)
+  // Sample products if no data exists.
   const sampleProducts: Product[] = [
     {
       id: 1,
@@ -73,15 +73,11 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
     },
   ];
 
-  // Global listings state.
   const [listings, setListings] = useState<Product[]>([]);
-  // Filtered products to display.
   const [products, setProducts] = useState<Product[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [favorites, setFavorites] = useState<Product[]>([]);
   const [showFavorites, setShowFavorites] = useState<boolean>(false);
 
-  // Filter state for color, type, and price.
   const [filters, setFilters] = useState<{
     category: string;
     color: string;
@@ -98,23 +94,21 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-  // Listen for custom listings update events dispatched from Navbar.
+  // Combined effect to load and update listings.
   useEffect(() => {
     const updateListings = () => {
       const data = localStorage.getItem("listings");
-      console.log("updateListings data:", data);
       if (data && data !== "null" && data !== "undefined") {
         try {
           const parsed = JSON.parse(data);
           if (Array.isArray(parsed) && parsed.length > 0) {
             setListings(parsed);
           } else {
-            // If the array is empty, initialize with sampleProducts.
             setListings(sampleProducts);
             localStorage.setItem("listings", JSON.stringify(sampleProducts));
           }
         } catch (error) {
-          console.error("Error parsing listings from localStorage", error);
+          console.error("Error parsing listings", error);
           setListings(sampleProducts);
           localStorage.setItem("listings", JSON.stringify(sampleProducts));
         }
@@ -123,49 +117,21 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
         localStorage.setItem("listings", JSON.stringify(sampleProducts));
       }
     };
-  
-    // Run updateListings on mount.
-    updateListings();
-  
-    // Listen for custom "listingsUpdated" events.
-    window.addEventListener("listingsUpdated", updateListings);
-    return () => {
-      window.removeEventListener("listingsUpdated", updateListings);
-    };
-  }, []);
-  
 
-  // Persist listings to localStorage on changes.
+    updateListings();
+    window.addEventListener("listingsUpdated", updateListings);
+    return () => window.removeEventListener("listingsUpdated", updateListings);
+  }, []);
+
   useEffect(() => {
     localStorage.setItem("listings", JSON.stringify(listings));
   }, [listings]);
 
-  // --- FAVORITES ---
-  const toggleFavorite = (item: Product) => {
-    setFavorites((prev) => {
-      const isFavorited = prev.some((fav) => fav.id === item.id);
-      return isFavorited ? prev.filter((fav) => fav.id !== item.id) : [...prev, item];
-    });
-  };
-
-  useEffect(() => {
-    const favData = localStorage.getItem("favorites");
-    if (favData) {
-      setFavorites(JSON.parse(favData));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-  }, [favorites]);
-
-  // --- FILTERING ---
   useEffect(() => {
     let filtered = listings;
     if (filters.category && filters.category !== "All") {
       filtered = filtered.filter(
-        (p) =>
-          p.category.toLowerCase() === filters.category.toLowerCase()
+        (p) => p.category.toLowerCase() === filters.category.toLowerCase()
       );
     }
     if (filters.color) {
@@ -182,7 +148,6 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
     setProducts(filtered);
     setCurrentPage(1);
   }, [filters, listings]);
-  
 
   const handleFilterChange = (key: keyof typeof filters, value: string | number[]) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -192,7 +157,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
 
   return (
     <div className="bg-[#EAF5FA] min-h-screen relative">
-      {/* Navbar is rendered at the top; create listing functionality is now centralized in Navbar */}
+      {/* Navbar */}
       <div className="sticky top-0 z-50">
         <Navbar />
       </div>
@@ -201,8 +166,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
       <div className="flex justify-between items-center mt-6 px-6">
         <h2 className="text-2xl font-bold text-gray-700">{currentCategory}</h2>
         <p className="text-gray-600">
-          Showing {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, products.length)} out of{" "}
-          {products.length} Products
+          Showing {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, products.length)} out of {products.length} Products
         </p>
       </div>
 
@@ -211,7 +175,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
         {/* Filters Column */}
         <div className="col-span-1 bg-white p-4 shadow rounded-md flex flex-col space-y-4">
           <h3 className="text-lg font-semibold text-gray-700 mb-4">Filters</h3>
-          {/* Filter: Color */}
+          {/* Color Filter */}
           <div className="mb-4">
             <label htmlFor="filter-color" className="text-gray-700 font-medium">
               Color
@@ -240,7 +204,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
               <option value="Multi-Color">Multi-Color</option>
             </select>
           </div>
-          {/* Filter: Type */}
+          {/* Type Filter */}
           <div className="mb-4">
             <label htmlFor="filter-type" className="text-gray-700 font-medium">
               Type
@@ -261,7 +225,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
               ))}
             </select>
           </div>
-          {/* Filter: Price */}
+          {/* Price Filter */}
           <div>
             <label htmlFor="filter-price" className="text-gray-600 font-medium">
               Price Range
@@ -350,9 +314,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
                 aria-label={`Page ${i + 1}`}
-                className={`px-3 py-2 border rounded ${
-                  currentPage === i + 1 ? "bg-blue-600 text-white" : "text-gray-600"
-                }`}
+                className={`px-3 py-2 border rounded ${currentPage === i + 1 ? "bg-blue-600 text-white" : "text-gray-600"}`}
               >
                 {i + 1}
               </button>
@@ -399,7 +361,9 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
             <ul>
               {favorites.map((fav) => (
                 <li key={fav.id} className="flex text-gray-700 text-sm justify-between items-center p-2 border-b">
-                  <span>{fav.name}</span>
+                  <Link href={`/product/${fav.id}`} className="flex-1">
+                    <span className="cursor-pointer hover:underline">{fav.name}</span>
+                  </Link>
                   <button onClick={() => toggleFavorite(fav)} aria-label="Remove favorite">
                     <X className="w-4 h-4 text-red-500 hover:text-red-900" />
                   </button>
