@@ -35,12 +35,23 @@ with app.app_context():
 # client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 def validate_session(token):
-    data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
-    if data["iat"] < datetime.now().timestamp() - 604800:
+    try:
+        data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+        user = db_instance.get_user_by_sub(data["sub"])
+        if user:
+            user_data = {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "profile_picture": user.profile_picture,
+            }
+            return jsonify(user_data)
+        else:
+            False
+    except jwt.ExpiredSignatureError:
         return False
-    if data["CWRU_validated"] == False:
+    except jwt.InvalidTokenError:
         return False
-    return True
     
 
 @app.route("/")
@@ -73,6 +84,7 @@ def signin():
                     "sub": idinfo["sub"],
                     "name": idinfo["name"],
                     "iat": datetime.now().timestamp(),
+                    "exp": datetime.now().timestamp() + 604800,
                 },
                 app.secret_key,
                 algorithm="HS256",
@@ -118,6 +130,29 @@ def get_products():
         products.append(product_data)
     return jsonify(products)
 
+@app.route("/api/user", methods=["GET"])
+def get_user():
+    token = request.cookies.get("jwt_token")
+    if not token:
+        return jsonify({"error": "Token not found"}), 401
+
+    try:
+        data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+        user = db_instance.get_user_by_sub(data["sub"])
+        if user:
+            user_data = {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "profile_picture": user.profile_picture,
+            }
+            return jsonify(user_data)
+        else:
+            return jsonify({"error": "User not found"}), 404
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid token"}), 401
 
 # Crear las tablas en la base de datos con manejo de errores
 # Making the datatables with error handling
