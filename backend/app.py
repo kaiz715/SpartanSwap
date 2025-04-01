@@ -34,6 +34,14 @@ with app.app_context():
 # OAuth 2 client setup
 # client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
+def validate_session(token):
+    data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+    if data["iat"] < datetime.now().timestamp() - 604800:
+        return False
+    if data["CWRU_validated"] == False:
+        return False
+    return True
+    
 
 @app.route("/")
 def hello_world():
@@ -52,6 +60,14 @@ def signin():
         # jsonify returns a response object
         return_data = {}
         if idinfo["hd"] == "case.edu":
+            if db_instance.get_user_by_sub(idinfo["sub"]) is None:
+                db_instance.add_user(
+                    sub=idinfo["sub"],
+                    email=idinfo["email"],
+                    name=idinfo["name"],
+                    profile_picture=idinfo["picture"],
+                )
+            
             return_data["jwt_token"] = jwt.encode(
                 {
                     "sub": idinfo["sub"],

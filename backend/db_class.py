@@ -31,14 +31,20 @@ class DBClass:
 
         return instance
 
-    def add_user(self, email, name, profile_picture=None):
+    def add_user(self, sub, email, name, profile_picture=None):
         """Method to add a user to the database"""
         with self.app.app_context():
-            new_user = User(email=email, name=name, profile_picture=profile_picture)
+            new_user = User(sub=sub, email=email, name=name, profile_picture=profile_picture)
             self.db.session.add(new_user)
             self.db.session.commit()
             print(f"Usuario {name} agregado correctamente.")
-
+        
+    def get_user_by_sub(self, sub):
+        """Method to retrieve a user by sub from the database"""
+        with self.app.app_context():
+            user = User.query.filter_by(sub=sub).first()
+            return user
+    
     def add_item(
         self,
         seller_id,
@@ -78,6 +84,7 @@ db = DBClass.db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    sub = db.Column(db.String(100), unique=True, nullable=False)
     profile_picture = db.Column(db.String(255), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
