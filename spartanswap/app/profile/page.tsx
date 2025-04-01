@@ -36,7 +36,7 @@ export default function ProfilePage() {
         }
         else{
           setFullName(response.data.name);
-          setEmailAddresses([response.data.email]);
+          setEmailAddresses(emailAddresses.concat(response.data.emails));
         }
         
       })

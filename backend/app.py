@@ -134,7 +134,7 @@ def get_products():
 def get_user():
     token = request.cookies.get("jwt_token")
     if not token:
-        return jsonify({"error": "Token not found"}), 401
+        return jsonify({"error": "Not logged in"}), 401
 
     try:
         data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
