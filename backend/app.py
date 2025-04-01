@@ -66,6 +66,7 @@ def signin():
             return_data["CWRU_validated"] = False
         return jsonify(return_data)
     except Exception as e:
+        print(e)
         abort(403)
 
 
