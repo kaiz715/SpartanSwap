@@ -2,25 +2,63 @@
 
 import { useCookies } from "react-cookie";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import Link from "next/link";
-import { useEffect } from "react";
 import axios from "axios";
+import Navbar from "../components/Navbar";
 
 export default function ProfilePage() {
   const [cookies] = useCookies(["jwt_token"]);
   const isLoggedIn = Boolean(cookies.jwt_token);
 
-  // For demonstration, local state for user info
+  // Local state for user info.
   const [fullName, setFullName] = useState("");
   const [gender, setGender] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [emailAddresses, setEmailAddresses] = useState<string[]>([
-    "alexarawles@gmail.com",
-  ]);
-
-  // Example of how you might handle adding a new email
+  const [emailAddresses, setEmailAddresses] = useState<string[]>([]);
   const [newEmail, setNewEmail] = useState("");
+
+  // Profile photo state. Default to an empty string.
+  const [profilePhoto, setProfilePhoto] = useState("/avatar.png");
+
+  // Save status message.
+  const [saveStatus, setSaveStatus] = useState("");
+
+  // Handler for uploading a new profile photo.
+  const handleProfilePhotoUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const photoURL = URL.createObjectURL(file);
+    setProfilePhoto(photoURL);
+  };
+
+  // Load profile from backend.
+  const loadProfile = async () => {
+    try {
+      const response = await axios.get("http://localhost:5001/api/user", {
+        withCredentials: true,
+      });
+      if (response.data.error) {
+        console.error("Error fetching profile data:", response.data.error);
+      } else {
+        setFullName(response.data.name || "");
+        setGender(response.data.gender || "");
+        setPhoneNumber(response.data.phoneNumber || "");
+        setEmailAddresses(response.data.emails || []);
+        // Set the default Google profile photo if provided.
+        if (response.data.profilePhoto) {
+          setProfilePhoto(response.data.profilePhoto);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading profile", error);
+    }
+  };
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
   const handleAddEmail = () => {
     if (newEmail) {
       setEmailAddresses((prev) => [...prev, newEmail]);
@@ -28,28 +66,28 @@ export default function ProfilePage() {
     }
   };
 
-  const loadProfile = async () => {
-    axios.get("http://localhost:5001/api/user", { withCredentials: true })
-      .then(response => {
-        if (response.data.error) {
-          console.error("Error fetching profile data:", response.data.error);
-        }
-        else{
-          setFullName(response.data.name);
-          setEmailAddresses(emailAddresses.concat(response.data.email));
-        }
-        
-      })
+  // Save all profile data to the backend.
+  const saveProfile = async () => {
+    try {
+      const payload = {
+        name: fullName,
+        gender,
+        phoneNumber,
+        emails: emailAddresses,
+        profilePhoto, // This could be a temporary URL or a permanent URL if you've uploaded.
+      };
+      await axios.put("http://localhost:5001/api/user", payload, { withCredentials: true });
+      setSaveStatus("Profile saved successfully!");
+    } catch (error) {
+      console.error("Error updating profile", error);
+      setSaveStatus("Error saving profile.");
     }
+    setTimeout(() => setSaveStatus(""), 3000);
+  };
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
-
-  // If user isn't logged in, optionally redirect or show a message
   if (!isLoggedIn) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
+      <div className="flex flex-col items-center justify-center h-screen text-gray-700">
         <p>You are not logged in.</p>
         <Link href="/">
           <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
@@ -61,115 +99,127 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="bg-[#EAF5FA] min-h-screen p-4">
-      <nav className="flex items-center justify-between px-4 h-16 border-b bg-white">
-        {/* Example minimal nav on top of profile page */}
-        <Link href="/">
-          <Image
-            src="/logo.png"
-            alt="SpartanSwap Logo"
-            width={80}
-            height={80}
-            className="object-contain cursor-pointer"
-          />
-        </Link>
-        <div className="flex space-x-2">
-          <Link href="/homegoods" className="px-4 py-2 border rounded">
-            Home Goods
-          </Link>
-          <Link href="/clothes" className="px-4 py-2 border rounded">
-            Clothes
-          </Link>
-          <Link href="/rental" className="px-4 py-2 border rounded">
-            Rental
-          </Link>
-          <Link href="/tickets" className="px-4 py-2 border rounded">
-            Tickets
-          </Link>
-        </div>
-      </nav>
+    <div className="bg-[#EAF5FA] min-h-screen p-4 text-gray-700">
+      <Navbar />
 
       <div className="max-w-5xl mx-auto mt-8 p-6 bg-white shadow-md rounded-md">
-        <h1 className="text-xl font-bold mb-4">Welcome, XXXXX</h1>
+        <h1 className="text-xl font-bold mb-4">Welcome, {fullName || "User"}</h1>
 
         {/* Basic user info section */}
         <div className="flex items-center mb-6 space-x-4">
-          {/* User avatar */}
-          <div className="w-20 h-20 rounded-full overflow-hidden">
-            <Image
-              src="/avatar.png" // Replace with user's actual photo or from Google
-              alt="User Avatar"
-              width={80}
-              height={80}
-              className="object-cover w-full h-full"
+          {/* Profile photo with clickable upload */}
+          <label htmlFor="profile-upload" className="cursor-pointer" aria-label="Upload profile photo">
+            <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center">
+              <Image
+                src={profilePhoto}
+                alt="User Profile Picture"
+                width={80}
+                height={80}
+                className="object-cover w-full h-full"
+              />
+            </div>
+            <input
+              id="profile-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleProfilePhotoUpload}
+              className="hidden"
             />
-          </div>
+          </label>
           {/* Basic info */}
           <div>
-            <p className="font-semibold">xxx.xxxx@case.edu</p>
-            <p>Seller ID: XXX</p>
+            <p id="profile-email" className="font-semibold">{emailAddresses}</p>
+            <p id="seller-id">Seller ID: XXX</p>
           </div>
-          <button className="ml-auto px-4 py-2 bg-blue-600 text-white rounded">
-            Edit
-          </button>
         </div>
 
         {/* Form Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Full Name */}
           <div>
-            <label className="block text-gray-700">Full Name</label>
+            <label htmlFor="full-name" className="block">
+              Full Name
+            </label>
             <input
+              id="full-name"
               type="text"
-              placeholder="Your First Name"
+              placeholder="Your Full Name"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="w-full border p-2 rounded mt-1"
             />
           </div>
+          {/* Email Addresses */}
           <div>
-            <label className="block text-gray-700">Email Address</label>
-            {/* List existing email addresses */}
-            {emailAddresses.map((email, idx) => (
-              <p key={idx} className="mt-1 text-gray-800">
-                {email}
-              </p>
-            ))}
+            <label htmlFor="email-address" className="block">
+              Email Address
+            </label>
+            <div id="email-address">
+              {emailAddresses.map((email, idx) => (
+                <p key={idx} className="mt-1">
+                  {email}
+                </p>
+              ))}
+            </div>
             <div className="flex space-x-2 mt-2">
               <input
+                id="new-email"
                 type="email"
                 placeholder="Add new email"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 className="border p-2 rounded flex-grow"
+                aria-label="New email address"
               />
               <button
                 onClick={handleAddEmail}
                 className="bg-blue-600 text-white px-3 py-2 rounded"
               >
-                +Add Email Address
+                + Add Email Address
               </button>
             </div>
           </div>
+          {/* Gender */}
           <div>
-            <label className="block text-gray-700">Gender</label>
+            <label htmlFor="gender" className="block">
+              Gender
+            </label>
             <input
+              id="gender"
               type="text"
-              placeholder="Your First Name"
+              placeholder="Enter Gender"
               value={gender}
               onChange={(e) => setGender(e.target.value)}
               className="w-full border p-2 rounded mt-1"
+              aria-label="Gender"
             />
           </div>
+          {/* Phone Number */}
           <div>
-            <label className="block text-gray-700">Phone Number</label>
+            <label htmlFor="phone-number" className="block">
+              Phone Number
+            </label>
             <input
+              id="phone-number"
               type="text"
-              placeholder="Your First Name"
+              placeholder="Enter Phone Number"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               className="w-full border p-2 rounded mt-1"
+              aria-label="Phone Number"
             />
           </div>
+        </div>
+
+        {/* Save Button */}
+        <div className="mt-6">
+          <button
+            onClick={saveProfile}
+            className="w-full bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            Save Profile
+          </button>
+          {saveStatus && <p className="mt-2 text-center">{saveStatus}</p>}
         </div>
       </div>
     </div>
