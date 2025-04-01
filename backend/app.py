@@ -70,7 +70,9 @@ def signin():
 
         # jsonify returns a response object
         return_data = {}
-        if idinfo["hd"] == "case.edu":
+        if "hd" not in idinfo:
+            return_data["CWRU_validated"] = False
+        elif idinfo["hd"] == "case.edu":
             if db_instance.get_user_by_sub(idinfo["sub"]) is None:
                 db_instance.add_user(
                     sub=idinfo["sub"],
