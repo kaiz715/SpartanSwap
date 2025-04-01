@@ -37,6 +37,24 @@ export const typeOptions: Record<string, string[]> = {
   Rental: ["Apartment", "House", "Room", "Office", "Other"],
 };
 
+
+// Define a color mapping to map color names to hex or CSS color values.
+const colorMap: Record<string, string> = {
+  Green: "#008000",
+  Brown: "#8b4513",
+  Gray: "#808080",
+  Blue: "#0000FF",
+  Red: "#FF0000",
+  Black: "#000000",
+  White: "#FFFFFF",
+  Yellow: "#FFFF00",
+  Orange: "#FFA500",
+  Purple: "#800080",
+  Beige: "#F5F5DC",
+  Cream: "#FFFDD0",
+  background: 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)',
+};
+
 interface ListingsPageProps {
   currentCategory: string;
 }
@@ -174,56 +192,53 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
       <div className="grid grid-cols-4 gap-6 max-w-7xl mx-auto px-6 mt-6">
         {/* Filters Column */}
         <div className="col-span-1 bg-white p-4 shadow rounded-md flex flex-col space-y-4">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Filters</h3>
+          <h3 className="text-lg font-semibold text-gray-700">Filters</h3>
           {/* Color Filter */}
           <div className="mb-4">
-            <label htmlFor="filter-color" className="text-gray-700 font-medium">
-              Color
-            </label>
-            <select
-              id="filter-color"
-              aria-label="Filter by color"
-              className="w-full border text-gray-800 p-2 rounded mt-2 bg-gray-100"
-              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                handleFilterChange("color", e.target.value)
-              }
-            >
-              <option value="">All</option>
-              <option value="Green">Green</option>
-              <option value="Brown">Brown</option>
-              <option value="Gray">Gray</option>
-              <option value="Blue">Blue</option>
-              <option value="Red">Red</option>
-              <option value="Black">Black</option>
-              <option value="White">White</option>
-              <option value="Yellow">Yellow</option>
-              <option value="Orange">Orange</option>
-              <option value="Purple">Purple</option>
-              <option value="Beige">Beige</option>
-              <option value="Cream">Cream</option>
-              <option value="Multi-Color">Multi-Color</option>
-            </select>
+            <h4 className="text-gray-700 font-medium mb-2">Color</h4>
+            <div className="flex flex-wrap gap-2">
+              {Object.keys(colorMap).map((colorName) => {
+                const isSelected = filters.color === colorName;
+
+                return (
+                  <button
+                    key={colorName}
+                    onClick={() => handleFilterChange("color", colorName)}
+                    className={`
+                      flex items-center gap-1 px-2 py-1 border rounded transition-colors
+                      ${isSelected ? "border-blue-600" : "border-gray-300"}
+                    `}
+                  >
+                    <span
+                      className="inline-block w-6 h-6 rounded-full"
+                      style={{ background: colorMap[colorName] }}
+                    />
+                    <span className=" text-gray-700 text-sm">{colorName}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
           {/* Type Filter */}
-          <div className="mb-4">
-            <label htmlFor="filter-type" className="text-gray-700 font-medium">
-              Type
-            </label>
-            <select
-              id="filter-type"
-              aria-label="Filter by type"
-              className="w-full border p-2 rounded text-gray-800 mt-2 bg-gray-100"
-              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                handleFilterChange("type", e.target.value)
-              }
-            >
-              <option value="">All</option>
-              {typeOptions[currentCategory]?.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+          <div>
+            <h4 className="text-gray-700 font-medium mb-2">Type</h4>
+            <div className="flex flex-wrap gap-2">
+              {["All", ...typeOptions[currentCategory]].map((typeOption) => {
+                const isSelected = filters.type === typeOption;
+                return (
+                  <button
+                    key={typeOption}
+                    onClick={() =>
+                      handleFilterChange("type", typeOption === "All" ? "" : typeOption)
+                    }
+                    className={`px-3 py-1 border rounded transition-colors text-sm 
+                      ${isSelected ? "border-blue-600 bg-blue-100 text-blue-900" : "border-gray-300 text-gray-700"}`}
+                  >
+                    {typeOption}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           {/* Price Filter */}
           <div>
