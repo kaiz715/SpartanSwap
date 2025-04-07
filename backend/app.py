@@ -187,6 +187,22 @@ def get_user():
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 401
 
+# @app.route("/api/user", methods=["PUT"])
+# def update_user():
+#     token = request.cookies.get("jwt_token")
+#     user = validate_session(token)
+#     if not user:
+#         return jsonify({"error": "Not logged in or invalid token"}), 401
+
+#     profile_data = request.json
+#     user.name = profile_data.get("name", user.name)
+#     user.gender = profile_data.get("gender", user.gender)
+#     user.phone_number = profile_data.get("phone_number", user.phone_number)
+#     user.profile_picture = profile_data.get("profile_picture", user.profile_picture)
+
+#     db.session.commit()
+#     return jsonify({"message": "User updated successfully"}), 200
+
 # Crear las tablas en la base de datos con manejo de errores
 # Making the datatables with error handling
 if __name__ == "__main__":
