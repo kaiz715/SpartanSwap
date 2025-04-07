@@ -31,10 +31,17 @@ class DBClass:
 
         return instance
 
-    def add_user(self, sub, email, name, profile_picture=None):
+    def add_user(self, sub, email, name, profile_picture=None, gender=None, phone_number=None):
         """Method to add a user to the database"""
         with self.app.app_context():
-            new_user = User(sub=sub, email=email, name=name, profile_picture=profile_picture)
+            new_user = User(
+                sub=sub,
+                email=email,
+                name=name,
+                profile_picture=profile_picture,
+                gender=gender,
+                phone_number=phone_number
+            )
             self.db.session.add(new_user)
             self.db.session.commit()
             print(f"Usuario {name} agregado correctamente.")
@@ -49,34 +56,44 @@ class DBClass:
         self,
         seller_id,
         item_type,
+        category,
         color,
         price,
         condition,
         name,
         image_url=None,
         orders=0,
+        description=None,
+        is_custom=False,
     ):
         """Method to add an item to the database"""
         with self.app.app_context():
             new_item = Item(
                 seller_id=seller_id,
                 item_type=item_type,
+                category=category,
                 color=color,
                 price=price,
                 condition=condition,
                 image_url=image_url,
                 name=name,
                 orders=orders,
+                description=description,
+                is_custom=is_custom,
             )
             self.db.session.add(new_item)
             self.db.session.commit()
             print(f"Ítem {name} agregado correctamente.")
 
-    def get_all_items(self):
-        """Method to retrieve all items from the database"""
+    def get_all_items(self, category=None):
+        """Method to retrieve items from the database, optionally filtered by category"""
         with self.app.app_context():
-            items = Item.query.all()
+            query = Item.query
+            if category:
+                query = query.filter_by(category=category)
+            items = query.all()
             return items
+
 
 
 db = DBClass.db
@@ -88,6 +105,8 @@ class User(db.Model):
     profile_picture = db.Column(db.String(255), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
+    gender = db.Column(db.String(50), nullable=True)
+    phone_number = db.Column(db.String(20), nullable=True)
     account_create_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     items = db.relationship("Item", backref="seller", lazy=True)
@@ -99,12 +118,14 @@ class Item(db.Model):
     date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     seller_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     item_type = db.Column(db.String(50), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
     color = db.Column(db.String(50), nullable=True)
     price = db.Column(db.Float, nullable=False)
     condition = db.Column(db.String(50), nullable=False)
     image_url = db.Column(db.String(255), nullable=True)
-    # New fields
     name = db.Column(db.String(255), nullable=False)
     orders = db.Column(db.Integer, default=0)
+    description = db.Column(db.Text, nullable=True)
+    is_custom = db.Column(db.Boolean, default=False)
 
     __table_args__ = (CheckConstraint("price > 0", name="check_price_positive"),)

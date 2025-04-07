@@ -21,7 +21,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///spartanswap.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize the database
-db_instance = DBClass(app)
+with app.app_context():
+    db_instance = DBClass(app)
+    db_instance.db.create_all() 
 
 # Configure CORS
 CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
@@ -104,20 +106,44 @@ def signin():
 # def callback():
 #     return "Google login test"
 
-db_instance.add_item(
-    seller_id=1,
-    item_type="Furniture",
-    color="Green",
-    price=199.23,
-    condition="New",
-    name="something added in the backend",  # New required field
-    orders=24,  # New field
-)
+# Replace the existing initialization with:
+with app.app_context():
+    # Explicitly create all tables
+    #db_instance.db.drop_all()
+    if not os.path.exists('instance/spartanswap.db'):
+        db_instance.db.create_all()
+        print("Created new database")
+    else:
+        print("Using existing database")
+    
+    """ # Create a test user first
+    db_instance.add_user(
+        sub="test-user-123",
+        email="test@case.edu",
+        name="Test User"
+    ) """
+    
+    # Then add the test item
+    db_instance.add_item(
+        seller_id=1,  # Matches the test user's ID
+        item_type="Furniture",
+        category="Home Goods",
+        color="Green",
+        price=199.23,
+        condition="New",
+        name="Test Item",
+        orders=24,
+        description="Test description",
+        is_custom=True
+    )
 
 
 @app.route("/api/products", methods=["GET"])
 def get_products():
-    items = db_instance.get_all_items()
+    #print(1)
+    category = request.args.get('category')
+    items = db_instance.get_all_items(category=category)
+    
     products = []
     for item in items:
         product_data = {
@@ -128,6 +154,9 @@ def get_products():
             "image": item.image_url if item.image_url else "/essentials.jpg",
             "type": item.item_type,
             "color": item.color,
+            "category": item.category,
+            "description": item.description,
+            "isCustom": item.is_custom
         }
         products.append(product_data)
     return jsonify(products)
@@ -145,7 +174,9 @@ def get_user():
             user_data = {
                 "id": user.id,
                 "name": user.name,
-                "email": user.email,
+                "gender": user.gender,
+                "phoneNumber": user.phone_number,
+                "emailAddresses": [user.email],
                 "profile_picture": user.profile_picture,
             }
             return jsonify(user_data)
