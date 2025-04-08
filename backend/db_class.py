@@ -30,6 +30,7 @@ class DBClass:
             print("Database successfully created.")
 
         return instance
+        
 
     def add_user(self, sub, email, name, profile_picture=None, gender=None, phone_number=None):
         """Method to add a user to the database"""
@@ -50,6 +51,7 @@ class DBClass:
         """Method to retrieve a user by sub from the database"""
         with self.app.app_context():
             user = User.query.filter_by(sub=sub).first()
+            #print(type(user))
             return user
     
     def add_item(
@@ -93,6 +95,29 @@ class DBClass:
                 query = query.filter_by(category=category)
             items = query.all()
             return items
+    def update_user(self, sub, email=None, name=None, profile_picture=None, gender=None, phone_number=None):
+        """Update a user's information in the database"""
+        with self.app.app_context():
+            user = User.query.filter_by(sub=sub).first()
+            if not user:
+                print(f"User with sub {sub} not found.")
+                return None
+
+            # Update provided fields
+            if email is not None:
+                user.email = email
+            if name is not None:
+                user.name = name
+            if profile_picture is not None:
+                user.profile_picture = profile_picture
+            if gender is not None:
+                user.gender = gender
+            if phone_number is not None:
+                user.phone_number = phone_number
+
+            self.db.session.commit()
+            print(f"User {user.name} updated successfully.")
+            return user
 
 
 

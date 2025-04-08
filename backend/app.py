@@ -1,6 +1,7 @@
 from flask import Flask, Response, abort, jsonify, redirect, request, session, url_for
 from flask_cors import CORS
 from database import db
+from db_class import User
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from environment import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
@@ -14,7 +15,7 @@ from db_class import DBClass
 import os
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = "super secure secret key"
 
 # Database configuration
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///spartanswap.db"
@@ -40,6 +41,7 @@ def validate_session(token):
     try:
         data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
         user = db_instance.get_user_by_sub(data["sub"])
+        #print("right here willis: ", type(user))
         if user:
             user_data = {
                 "id": user.id,
@@ -47,9 +49,10 @@ def validate_session(token):
                 "email": user.email,
                 "profile_picture": user.profile_picture,
             }
-            return jsonify(user_data)
+            #return user_data
+            return user
         else:
-            False
+            return False
     except jwt.ExpiredSignatureError:
         return False
     except jwt.InvalidTokenError:
@@ -164,12 +167,15 @@ def get_products():
 @app.route("/api/user", methods=["GET"])
 def get_user():
     token = request.cookies.get("jwt_token")
+    #print(token)
     if not token:
         return jsonify({"error": "Not logged in"}), 401
 
     try:
         data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+        print(data)
         user = db_instance.get_user_by_sub(data["sub"])
+        print(user.phone_number)
         if user:
             user_data = {
                 "id": user.id,
@@ -179,6 +185,7 @@ def get_user():
                 "emailAddresses": [user.email],
                 "profile_picture": user.profile_picture,
             }
+            print(user_data)
             return jsonify(user_data)
         else:
             return jsonify({"error": "User not found"}), 404
@@ -187,21 +194,33 @@ def get_user():
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 401
 
-# @app.route("/api/user", methods=["PUT"])
-# def update_user():
-#     token = request.cookies.get("jwt_token")
-#     user = validate_session(token)
-#     if not user:
-#         return jsonify({"error": "Not logged in or invalid token"}), 401
+@app.route("/api/user", methods=["PUT"])
+def update_user():
+    token = request.cookies.get("jwt_token")
+    user = validate_session(token)
+    
+    if not user:
+        return jsonify({"error": "Not logged in or invalid token"}), 401
 
-#     profile_data = request.json
-#     user.name = profile_data.get("name", user.name)
-#     user.gender = profile_data.get("gender", user.gender)
-#     user.phone_number = profile_data.get("phone_number", user.phone_number)
-#     user.profile_picture = profile_data.get("profile_picture", user.profile_picture)
+    profile_data = request.json
+    
+    try:
+        # Update fields directly without app context wrapper
+        user.name = profile_data.get("name", user.name)
+        user.gender = profile_data.get("gender", user.gender)
+        user.phone_number = profile_data.get("phoneNumber", user.phone_number)  # Note: phoneNumber vs phone_number
+        user.profile_picture = profile_data.get("profilePhoto", user.profile_picture)
 
-#     db.session.commit()
-#     return jsonify({"message": "User updated successfully"}), 200
+        # Explicitly add to session and commit
+        db_instance.db.session.add(user)
+        db_instance.db.session.commit()
+        
+        return jsonify({"message": "User updated successfully"}), 200
+        
+    except Exception as e:
+        db_instance.db.session.rollback()
+        print(f"Error updating user: {str(e)}")
+        return jsonify({"error": "Database update failed"}), 500
 
 # Crear las tablas en la base de datos con manejo de errores
 # Making the datatables with error handling
