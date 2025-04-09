@@ -25,12 +25,35 @@ export default function ProfilePage() {
   const [saveStatus, setSaveStatus] = useState("");
 
   // Handler for uploading a new profile photo.
-  const handleProfilePhotoUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePhotoUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const photoURL = URL.createObjectURL(file);
-    setProfilePhoto(photoURL);
+  
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = (reader.result as string).split(",")[1];
+  
+      try {
+        const formData = new FormData();
+        formData.append("image", base64);
+  
+        const response = await axios.post(
+          "https://api.imgbb.com/1/upload?key=aaeb2e69efbfbf1b37e059229378b797",
+          formData
+        );
+  
+        const imageUrl = response.data.data.url;
+        console.log("Uploaded image URL:", imageUrl);
+        setProfilePhoto(imageUrl);
+      } catch (error) {
+        console.error("Failed to upload image:", error);
+      }
+    };
+  
+    reader.readAsDataURL(file);
   };
+  
+  
 
   // Load profile from backend.
   const loadProfile = async () => {
