@@ -64,6 +64,7 @@ export default function ProfilePage() {
       if (response.data.error) {
         console.error("Error fetching profile data:", response.data.error);
       } else {
+        console.log("Profile data loaded:", response.data);
         setFullName(response.data.name || "");
         setGender(response.data.gender || "");
         setPhoneNumber(response.data.phoneNumber || "");
@@ -183,23 +184,6 @@ export default function ProfilePage() {
                   {email}
                 </p>
               ))}
-            </div>
-            <div className="flex space-x-2 mt-2">
-              <input
-                id="new-email"
-                type="email"
-                placeholder="Add new email"
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-                className="border p-2 rounded flex-grow"
-                aria-label="New email address"
-              />
-              <button
-                onClick={handleAddEmail}
-                className="bg-blue-600 text-white px-3 py-2 rounded"
-              >
-                + Add Email Address
-              </button>
             </div>
           </div>
           {/* Gender */}
