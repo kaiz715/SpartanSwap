@@ -30,6 +30,12 @@ export default function Navbar() {
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [profilePicture, setProfilePicture] = useState("/profileIcon.png");
+  const [fullName, setFullName] = useState("");
+  const [gender, setGender] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [emailAddresses, setEmailAddresses] = useState<string[]>([]);
+  const [newEmail, setNewEmail] = useState("");
+  const [id, setId] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -37,9 +43,15 @@ export default function Navbar() {
         const response = await axios.get("http://localhost:5001/api/user", {
           withCredentials: true,
         });
+        setFullName(response.data.name || "");
+        setGender(response.data.gender || "");
+        setPhoneNumber(response.data.phoneNumber || "");
+        setEmailAddresses(response.data.emailAddresses || []);
+        setId(response.data.id || "");
         if (response.data.profile_picture) {
           setProfilePicture(response.data.profile_picture);
         }
+
       } catch (error) {
         console.error("Failed to load profile picture", error);
       }
@@ -90,7 +102,7 @@ export default function Navbar() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const photoURL = URL.createObjectURL(file);
+      const photoURL = URL.createObjectURL(file); // need to change this to permanent url?
       setNewListing((prev) => ({ ...prev, photo: file, photoURL }));
     }
   };
@@ -110,10 +122,10 @@ export default function Navbar() {
     }
   };
 
-  const handleAddListing = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddListing = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const product = {
-      id: Date.now(),
+      id: id,
       name: newListing.title,
       price: Number(newListing.price),
       orders: 0,
@@ -123,6 +135,7 @@ export default function Navbar() {
       category: newListing.category,
       description: newListing.description,
       isCustom: true,
+      image_url: newListing.photoURL,
     };
 
     const existingListings = localStorage.getItem("listings");
@@ -141,7 +154,21 @@ export default function Navbar() {
       category: defaultCategory,
       color: "",
     });
+    await saveListingToBackend(product);
+
     setShowCreateModal(false);
+    window.location.reload();
+  };
+
+  const saveListingToBackend = async (product: any) => {
+    try {
+      const response = await axios.put("http://localhost:5001/api/add_listing", product, {
+        withCredentials: true,
+      });
+      console.log("Listing saved to backend:", response.data);
+    } catch (error) {
+      console.error("Error saving listing to backend:", error);
+    }
   };
 
   return (

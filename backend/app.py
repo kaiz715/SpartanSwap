@@ -1,7 +1,7 @@
 from flask import Flask, Response, abort, jsonify, redirect, request, session, url_for
 from flask_cors import CORS
 from database import db
-from db_class import User
+from db_class import User, Item
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from environment import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
@@ -59,9 +59,18 @@ def validate_session(token):
         return False
     
 
-@app.route("/")
-def hello_world():
-    return "Hello, World!"
+@app.route("/validate", methods=["GET"])
+def validate():
+    token = request.cookies.get("jwt_token")
+    if not token:
+        return jsonify({"error": "Not logged in"}), 401
+
+    user = validate_session(token)
+    
+    if user:
+        return jsonify({"valid": True, "user": user.name}), 200
+    else:
+        return jsonify({"valid": False}), 401
 
 
 @app.route("/signin", methods=["POST"])
@@ -220,6 +229,38 @@ def update_user():
     except Exception as e:
         db_instance.db.session.rollback()
         print(f"Error updating user: {str(e)}")
+        return jsonify({"error": "Database update failed"}), 500
+    
+@app.route("/api/add_listing", methods=["PUT"])
+def add_listing():
+    token = request.cookies.get("jwt_token")
+    user = validate_session(token)
+    
+    if not user:
+        return jsonify({"error": "Not logged in or invalid token"}), 401
+
+    listing_data = request.json
+    try:
+        # Update fields directly without app context wrapper
+        db_instance.add_item(
+            seller_id=listing_data["id"],  # Matches the test user's ID
+            item_type=listing_data["type"],
+            category=listing_data["category"],
+            color=listing_data["color"],
+            price=listing_data["price"],
+            condition="New",
+            name=listing_data["name"],
+            orders=listing_data["orders"],
+            description=listing_data["description"],
+            is_custom=listing_data["isCustom"],
+            image_url=listing_data["image_url"]
+        )
+        
+        return jsonify({"message": "Listing added successfully"}), 200
+        
+    except Exception as e:
+        db_instance.db.session.rollback()
+        print(f"Error adding item: {str(e)}")
         return jsonify({"error": "Database update failed"}), 500
 
 # Crear las tablas en la base de datos con manejo de errores

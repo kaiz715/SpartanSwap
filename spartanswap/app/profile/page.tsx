@@ -1,6 +1,6 @@
 "use client";
 
-import { useCookies } from "react-cookie";
+import { CookiesProvider, useCookies } from 'react-cookie'
 import Image from "next/image";
 import { useState, useEffect, ChangeEvent } from "react";
 import Link from "next/link";
@@ -8,8 +8,8 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 
 export default function ProfilePage() {
-  const [cookies] = useCookies(["jwt_token"]);
-  const isLoggedIn = Boolean(cookies.jwt_token);
+  const [cookies, setCookie, removeCookie] = useCookies(["jwt_token"]);
+  let isLoggedIn = Boolean(cookies.jwt_token);
 
   // Local state for user info.
   const [fullName, setFullName] = useState("");
@@ -62,6 +62,8 @@ export default function ProfilePage() {
         withCredentials: true,
       });
       if (response.data.error) {
+        removeCookie("jwt_token",{ path: "/" });
+        isLoggedIn = false;
         console.error("Error fetching profile data:", response.data.error);
       } else {
         console.log("Profile data loaded:", response.data);
@@ -75,6 +77,8 @@ export default function ProfilePage() {
         }
       }
     } catch (error) {
+      removeCookie("jwt_token",{ path: "/" });
+      isLoggedIn = false;
       console.error("Error loading profile", error);
     }
   };
