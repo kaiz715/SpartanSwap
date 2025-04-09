@@ -44,10 +44,10 @@ export default function ProfilePage() {
         setFullName(response.data.name || "");
         setGender(response.data.gender || "");
         setPhoneNumber(response.data.phoneNumber || "");
-        setEmailAddresses(response.data.emails || []);
+        setEmailAddresses(response.data.emailAddresses || []);
         // Set the default Google profile photo if provided.
-        if (response.data.profilePhoto) {
-          setProfilePhoto(response.data.profilePhoto);
+        if (response.data.profile_picture) {
+          setProfilePhoto(response.data.profile_picture);
         }
       }
     } catch (error) {

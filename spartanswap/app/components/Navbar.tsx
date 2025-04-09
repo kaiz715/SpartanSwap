@@ -5,8 +5,9 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useCookies } from "react-cookie";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SignInWithGoogle from "@/app/components/signin";
+import axios from "axios";
 
 // Define the allowed Category type.
 type Category = "Home Goods" | "Clothes" | "Tickets" | "Rental";
@@ -21,17 +22,34 @@ const categoryMapping: Record<string, string> = {
 
 export default function Navbar() {
   const pathname = usePathname();
-  // Extract the first segment of the URL and convert it to lowercase.
   const slug = pathname.split("/")[1].toLowerCase();
-  // Use the mapping to get the default category, default to "Home Goods" if no match.
-  const defaultCategory: Category =
-  (categoryMapping[slug as keyof typeof categoryMapping] || "Home Goods") as Category;
+  const defaultCategory: Category = (categoryMapping[slug as keyof typeof categoryMapping] || "Home Goods") as Category;
+
   const [cookies] = useCookies(["jwt_token"]);
   const isLoggedIn = Boolean(cookies.jwt_token);
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [profilePicture, setProfilePicture] = useState("/profileIcon.png");
 
-  // Update typeOptions to use the Category type.
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get("http://localhost:5001/api/user", {
+          withCredentials: true,
+        });
+        if (response.data.profile_picture) {
+          setProfilePicture(response.data.profile_picture);
+        }
+      } catch (error) {
+        console.error("Failed to load profile picture", error);
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchProfile();
+    }
+  }, [isLoggedIn]);
+
   const typeOptions: Record<Category, string[]> = {
     "Home Goods": [
       "Decor",
@@ -47,7 +65,6 @@ export default function Navbar() {
     Rental: ["Apartment", "House", "Room", "Office", "Other"],
   };
 
-  // Define the type for your newListing state.
   interface NewListingData {
     photo: File | null;
     photoURL: string;
@@ -59,7 +76,6 @@ export default function Navbar() {
     color: string;
   }
 
-  // State for the new listing form data. Note that we initialize category with defaultCategory.
   const [newListing, setNewListing] = useState<NewListingData>({
     photo: null,
     photoURL: "",
@@ -67,11 +83,10 @@ export default function Navbar() {
     description: "",
     price: "",
     type: "",
-    category: defaultCategory, // use defaultCategory here
+    category: defaultCategory,
     color: "",
   });
 
-  // Handler for file uploads.
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -80,17 +95,14 @@ export default function Navbar() {
     }
   };
 
-  // Handler for form field changes.
   const handleFormChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     if (name === "category") {
       setNewListing((prev) => ({
         ...prev,
-        category: value as Category, // cast value to Category
+        category: value as Category,
         type: "",
       }));
     } else {
@@ -98,7 +110,6 @@ export default function Navbar() {
     }
   };
 
-  // Handler for adding a new listing.
   const handleAddListing = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const product = {
@@ -114,16 +125,12 @@ export default function Navbar() {
       isCustom: true,
     };
 
-    // Retrieve any existing listings from localStorage.
     const existingListings = localStorage.getItem("listings");
     const listings = existingListings ? JSON.parse(existingListings) : [];
     listings.push(product);
     localStorage.setItem("listings", JSON.stringify(listings));
-    console.log("Updated listings:", JSON.parse(localStorage.getItem("listings") || "[]"));
-    // Dispatch a custom event to notify other parts of the app.
     window.dispatchEvent(new Event("listingsUpdated"));
 
-    // Reset the form state and close the modal.
     setNewListing({
       photo: null,
       photoURL: "",
@@ -131,7 +138,7 @@ export default function Navbar() {
       description: "",
       price: "",
       type: "",
-      category: defaultCategory, // reset to defaultCategory
+      category: defaultCategory,
       color: "",
     });
     setShowCreateModal(false);
@@ -161,13 +168,7 @@ export default function Navbar() {
 
         {/* Center - Navigation Links */}
         <ul className="hidden md:flex flex-grow justify-center">
-          {[
-            { name: "Home", href: "/" },
-            { name: "Home Goods", href: "/homegoods" },
-            { name: "Clothes", href: "/clothes" },
-            { name: "Rental", href: "/rental" },
-            { name: "Tickets", href: "/tickets" },
-          ].map((tab) => (
+          {[{ name: "Home", href: "/" }, { name: "Home Goods", href: "/homegoods" }, { name: "Clothes", href: "/clothes" }, { name: "Rental", href: "/rental" }, { name: "Tickets", href: "/tickets" }].map((tab) => (
             <li key={tab.href}>
               <Link
                 href={tab.href}
@@ -201,11 +202,11 @@ export default function Navbar() {
           ) : (
             <Link href="/profile">
               <Image
-                src="/profileIcon.png"
+                src={profilePicture}
                 alt="Profile"
                 width={40}
                 height={40}
-                className="object-contain cursor-pointer rounded-full"
+                className="object-cover cursor-pointer rounded-full"
               />
             </Link>
           )}
@@ -238,7 +239,6 @@ export default function Navbar() {
           >
             <h2 className="text-xl font-bold mb-4">Create Listing</h2>
             <form onSubmit={handleAddListing} className="space-y-4">
-              {/* Photo Upload */}
               <div>
                 <label htmlFor="photo" className="block mb-1">
                   Photo Upload
@@ -260,7 +260,6 @@ export default function Navbar() {
                   />
                 )}
               </div>
-              {/* Title */}
               <div>
                 <label htmlFor="title" className="block mb-1">
                   Title
@@ -276,7 +275,6 @@ export default function Navbar() {
                   required
                 />
               </div>
-              {/* Description */}
               <div>
                 <label htmlFor="description" className="block mb-1">
                   Description
@@ -291,7 +289,6 @@ export default function Navbar() {
                   required
                 />
               </div>
-              {/* Price */}
               <div>
                 <label htmlFor="price" className="block mb-1">
                   Price
@@ -307,7 +304,6 @@ export default function Navbar() {
                   required
                 />
               </div>
-              {/* Category */}
               <div>
                 <label htmlFor="category" className="block mb-1">
                   Category
@@ -326,7 +322,6 @@ export default function Navbar() {
                   <option value="Rental">Rental</option>
                 </select>
               </div>
-              {/* Type */}
               <div>
                 <label htmlFor="type" className="block mb-1">
                   Type
@@ -347,7 +342,6 @@ export default function Navbar() {
                   ))}
                 </select>
               </div>
-              {/* Color */}
               <div>
                 <label htmlFor="color" className="block mb-1">
                   Color
@@ -376,7 +370,6 @@ export default function Navbar() {
                   <option value="Multi-Color">Multi-Color</option>
                 </select>
               </div>
-              {/* Form Buttons */}
               <div className="flex justify-end space-x-2">
                 <button
                   type="button"
