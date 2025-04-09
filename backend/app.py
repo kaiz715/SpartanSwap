@@ -8,6 +8,9 @@ from environment import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from datetime import datetime
 import jwt
 import os
+import requests
+import base64
+
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -294,6 +297,26 @@ def add_listing():
         print(f"Error adding item: {str(e)}")
         return jsonify({"error": "Database update failed"}), 500
 
+@app.route("/api/upload-profile-photo", methods=["POST"])
+def upload_profile_photo():
+    file = request.files.get("image")
+    if not file:
+        return jsonify({"error": "No file provided"}), 400
+
+    imgbb_api_key = "aaeb2e69efbfbf1b37e059229378b797"
+    url = "https://api.imgbb.com/1/upload"
+    payload = {
+        "key": imgbb_api_key,
+        "image": base64.b64encode(file.read()),
+    }
+
+    response = requests.post(url, data=payload)
+    if response.status_code == 200:
+        data = response.json()
+        return jsonify({"url": data["data"]["url"]})
+    else:
+        return jsonify({"error": "Failed to upload to imgbb"}), 500
+    
 # Crear las tablas en la base de datos con manejo de errores
 # Making the datatables with error handling
 if __name__ == "__main__":
