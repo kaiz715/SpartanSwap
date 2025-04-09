@@ -152,14 +152,16 @@ with app.app_context():
 
 @app.route("/api/products", methods=["GET"])
 def get_products():
-    #print(1)
+    print("listings got")
     category = request.args.get('category')
     items = db_instance.get_all_items(category=category)
     
     products = []
     for item in items:
+        print(item.name)
         product_data = {
             "id": item.id,
+            "sellerId": item.seller_id,
             "name": item.name,
             "price": item.price,
             "orders": item.orders,
@@ -185,6 +187,35 @@ def get_user():
         print(data)
         user = db_instance.get_user_by_sub(data["sub"])
         print(user.phone_number)
+        if user:
+            user_data = {
+                "id": user.id,
+                "name": user.name,
+                "gender": user.gender,
+                "phoneNumber": user.phone_number,
+                "emailAddresses": [user.email],
+                "profile_picture": user.profile_picture,
+            }
+            print(user_data)
+            return jsonify(user_data)
+        else:
+            return jsonify({"error": "User not found"}), 404
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid token"}), 401
+
+@app.route("/api/user_search/<int:user_id>", methods=["GET"])
+def user_search(user_id):
+    token = request.cookies.get("jwt_token")
+    user = validate_session(token)
+    
+    if not user:
+        return jsonify({"error": "Not logged in or invalid token"}), 401
+
+    try:
+        print(user_id)
+        user = db_instance.get_user_by_id(user_id)
         if user:
             user_data = {
                 "id": user.id,

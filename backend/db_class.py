@@ -54,6 +54,12 @@ class DBClass:
             #print(type(user))
             return user
     
+    def get_user_by_id(self, user_id):
+        """Method to retrieve a user by ID from the database"""
+        with self.app.app_context():
+            user = User.query.filter_by(id=user_id).first()
+            return user
+    
     def add_item(
         self,
         seller_id,

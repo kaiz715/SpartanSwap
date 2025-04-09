@@ -7,9 +7,11 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Heart, X } from "lucide-react";
 import { useFavorites } from "@/app/components/FavoritesContext";
+import axios from "axios";
 
 export interface Product {
     id: number;
+    sellerId: number;
     name: string;
     price: number;
     orders: number;
@@ -24,16 +26,41 @@ export interface Product {
 export default function ProductDetailClient({ id }: { id: string }) {
   const pathname = usePathname();
   const [product, setProduct] = useState<Product | null>(null);
+  const [sellerName, setSellerName] = useState("");
+  const [sellerEmail, setSellerEmail] = useState("");
+  const [sellerPhone, setSellerPhone] = useState("");
   const { favorites, toggleFavorite } = useFavorites();
   const [showFavorites, setShowFavorites] = useState<boolean>(false);
 
   useEffect(() => {
+    const fetchSellerInfo = async (sellerId: number) => {
+      try {
+        const response = await axios.get(`http://localhost:5001/api/user_search/${sellerId.toString()}`,{
+          withCredentials: true,
+        });
+        if (response.data) {
+          setSellerName(response.data.name);
+          setSellerEmail(response.data.emailAddresses[0]);
+          setSellerPhone(response.data.phoneNumber);
+          console.log("Seller info fetched:", response.data);
+
+        }
+      } catch (error) {
+        console.error("Error fetching seller info:", error);
+      }
+    };
+    
     const data = localStorage.getItem("listings");
     if (data) {
       const listings: Product[] = JSON.parse(data);
       const found = listings.find((p) => p.id === Number(id));
       setProduct(found || null);
+      console.log("Product found:", found);
+      if (found?.sellerId !== undefined) {
+        fetchSellerInfo(found.sellerId);
+      }
     }
+    
   }, [id]);
 
   const isFavorited = product ? favorites.some((fav) => fav.id === product.id) : false;
@@ -44,6 +71,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
     Tickets: "/tickets",
     Rental: "/rental",
   };
+
 
   if (!product) {
     return (

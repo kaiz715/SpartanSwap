@@ -11,6 +11,7 @@ import { useFavorites } from "@/app/components/FavoritesContext";
 
 export interface Product {
     id: number;
+    sellerId: number;
     name: string;
     price: number;
     orders: number;
@@ -96,6 +97,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [showFavorites, setShowFavorites] = useState<boolean>(false);
 
+    const [updated, setUpdated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -113,9 +115,14 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-
+                console.log(
+                    `Fetching products for category: ${currentCategory}`);
                 const data = await response.json();
+                console.log("Fetched data:", data);
                 setListings(data);
+                
+                console.log("Fetched products:", data);
+                console.log("listings: ", listings);
                 setError(null);
             } catch (err) {
                 console.error("Error fetching products:", err);
