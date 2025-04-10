@@ -317,6 +317,26 @@ def upload_profile_photo():
     else:
         return jsonify({"error": "Failed to upload to imgbb"}), 500
     
+@app.route("/api/upload-listing-photo", methods=["POST"])
+def upload_listing_photo():
+    file = request.files.get("image")
+    if not file:
+        return jsonify({"error": "No file provided"}), 400
+
+    imgbb_api_key = "aaeb2e69efbfbf1b37e059229378b797"
+    url = "https://api.imgbb.com/1/upload"
+    payload = {
+        "key": imgbb_api_key,
+        "image": base64.b64encode(file.read()),
+    }
+
+    response = requests.post(url, data=payload)
+    if response.status_code == 200:
+        data = response.json()
+        return jsonify({"url": data["data"]["url"]})
+    else:
+        return jsonify({"error": "Failed to upload to imgbb"}), 500
+    
 # Crear las tablas en la base de datos con manejo de errores
 # Making the datatables with error handling
 if __name__ == "__main__":

@@ -99,13 +99,27 @@ export default function Navbar() {
     color: "",
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const photoURL = URL.createObjectURL(file); // need to change this to permanent url?
-      setNewListing((prev) => ({ ...prev, photo: file, photoURL }));
+  
+      const formData = new FormData();
+      formData.append("image", file);
+  
+      try {
+        const response = await axios.post("http://localhost:5001/api/upload-listing-photo", formData, {
+          withCredentials: true,
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+  
+        const imageUrl = response.data.url;
+        setNewListing((prev) => ({ ...prev, photo: file, photoURL: imageUrl }));
+      } catch (error) {
+        console.error("Error uploading listing photo:", error);
+      }
     }
   };
+  
 
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
