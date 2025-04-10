@@ -107,7 +107,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
             try {
                 setIsLoading(true);
                 const response = await fetch(
-                    `http://localhost:5001/api/products?category=${encodeURIComponent(
+                    `http://spartanswapbackend.williserdman.com/api/products?category=${encodeURIComponent(
                         currentCategory
                     )}`
                 );
@@ -116,11 +116,12 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 console.log(
-                    `Fetching products for category: ${currentCategory}`);
+                    `Fetching products for category: ${currentCategory}`
+                );
                 const data = await response.json();
                 console.log("Fetched data:", data);
                 setListings(data);
-                
+
                 console.log("Fetched products:", data);
                 console.log("listings: ", listings);
                 setError(null);
