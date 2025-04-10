@@ -1,4 +1,5 @@
 {
+  "$schema": "/spartanswap/package.json",
   "name": "spartanswap",
   "version": "0.1.0",
   "private": true,
