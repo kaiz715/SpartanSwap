@@ -8,59 +8,60 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 
 export default function ProfilePage() {
-    const [cookies, setCookie, removeCookie] = useCookies(["jwt_token"]);
-    let isLoggedIn = Boolean(cookies.jwt_token);
+    const [cookies] = useCookies(["jwt_token"]);
+    const isLoggedIn = Boolean(cookies.jwt_token);
 
+    // Local state for user info.
     const [fullName, setFullName] = useState("");
     const [gender, setGender] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [emailAddresses, setEmailAddresses] = useState<string[]>([]);
     const [newEmail, setNewEmail] = useState("");
+
+    // Profile photo state. Default to an empty string.
     const [profilePhoto, setProfilePhoto] = useState("/avatar.png");
+
+    // Save status message.
     const [saveStatus, setSaveStatus] = useState("");
 
-    const uploadProfilePhoto = async (file: File) => {
-        const formData = new FormData();
-        formData.append("image", file);
-
-        try {
-            const response = await axios.post(
-                "http://localhost:5001/api/upload-profile-photo",
-                formData,
-                {
-                    withCredentials: true,
-                }
-            );
-            return response.data.url;
-        } catch (err) {
-            console.error("Error uploading image", err);
-            return null;
-        }
-    };
-
+    // Handler for uploading a new profile photo.
     const handleProfilePhotoUpload = async (
         e: ChangeEvent<HTMLInputElement>
     ) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        const uploadedUrl = await uploadProfilePhoto(file);
-        if (uploadedUrl) {
-            setProfilePhoto(uploadedUrl);
-        }
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64 = (reader.result as string).split(",")[1];
+
+            try {
+                const formData = new FormData();
+                formData.append("image", base64);
+
+                const response = await axios.post(
+                    "https://api.imgbb.com/1/upload?key=aaeb2e69efbfbf1b37e059229378b797",
+                    formData
+                );
+
+                const imageUrl = response.data.data.url;
+                console.log("Uploaded image URL:", imageUrl);
+                setProfilePhoto(imageUrl);
+            } catch (error) {
+                console.error("Failed to upload image:", error);
+            }
+        };
+
+        reader.readAsDataURL(file);
     };
 
+    // Load profile from backend.
     const loadProfile = async () => {
         try {
-            const response = await axios.get(
-                "http://localhost:5001/api/user",
-                {
-                    withCredentials: true,
-                }
-            );
+            const response = await axios.get("http://localhost:5001/api/user", {
+                withCredentials: true,
+            });
             if (response.data.error) {
-                removeCookie("jwt_token", { path: "/" });
-                isLoggedIn = false;
                 console.error(
                     "Error fetching profile data:",
                     response.data.error
@@ -71,13 +72,12 @@ export default function ProfilePage() {
                 setGender(response.data.gender || "");
                 setPhoneNumber(response.data.phoneNumber || "");
                 setEmailAddresses(response.data.emailAddresses || []);
+                // Set the default Google profile photo if provided.
                 if (response.data.profile_picture) {
                     setProfilePhoto(response.data.profile_picture);
                 }
             }
         } catch (error) {
-            removeCookie("jwt_token", { path: "/" });
-            isLoggedIn = false;
             console.error("Error loading profile", error);
         }
     };
@@ -93,6 +93,7 @@ export default function ProfilePage() {
         }
     };
 
+    // Save all profile data to the backend.
     const saveProfile = async () => {
         try {
             const payload = {
@@ -100,13 +101,11 @@ export default function ProfilePage() {
                 gender,
                 phoneNumber,
                 emails: emailAddresses,
-                profilePhoto,
+                profilePhoto, // This could be a temporary URL or a permanent URL if you've uploaded.
             };
-            await axios.put(
-                "http://localhost:5001/api/user",
-                payload,
-                { withCredentials: true }
-            );
+            await axios.put("http://localhost:5001/api/user", payload, {
+                withCredentials: true,
+            });
             setSaveStatus("Profile saved successfully!");
         } catch (error) {
             console.error("Error updating profile", error);
@@ -137,7 +136,9 @@ export default function ProfilePage() {
                     Welcome, {fullName || "User"}
                 </h1>
 
+                {/* Basic user info section */}
                 <div className="flex items-center mb-6 space-x-4">
+                    {/* Profile photo with clickable upload */}
                     <label
                         htmlFor="profile-upload"
                         className="cursor-pointer"
@@ -160,6 +161,7 @@ export default function ProfilePage() {
                             className="hidden"
                         />
                     </label>
+                    {/* Basic info */}
                     <div>
                         <p id="profile-email" className="font-semibold">
                             {emailAddresses}
@@ -168,7 +170,9 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
+                {/* Form Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Full Name */}
                     <div>
                         <label htmlFor="full-name" className="block">
                             Full Name
@@ -182,6 +186,7 @@ export default function ProfilePage() {
                             className="w-full border p-2 rounded mt-1"
                         />
                     </div>
+                    {/* Email Addresses */}
                     <div>
                         <label htmlFor="email-address" className="block">
                             Email Address
@@ -194,6 +199,7 @@ export default function ProfilePage() {
                             ))}
                         </div>
                     </div>
+                    {/* Gender */}
                     <div>
                         <label htmlFor="gender" className="block">
                             Gender
@@ -208,6 +214,7 @@ export default function ProfilePage() {
                             aria-label="Gender"
                         />
                     </div>
+                    {/* Phone Number */}
                     <div>
                         <label htmlFor="phone-number" className="block">
                             Phone Number
@@ -224,6 +231,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
+                {/* Save Button */}
                 <div className="mt-6">
                     <button
                         onClick={saveProfile}
