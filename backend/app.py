@@ -318,8 +318,10 @@ def delete_listing():
     listing_data = request.json
     
     try:
-        db_instance.delete_item(listing_data["id"])
-        return jsonify({"message": "Listing Deleted Successfully"}), 200
+        if db_instance.delete_item(listing_data["id"]):
+            return jsonify({"message": "Listing Deleted Successfully"}), 200
+        else:
+            return jsonify({"error": "Listing not found"}), 404
     except Exception as e:
         return jsonify({"error": "Database update failed"}), 500
 

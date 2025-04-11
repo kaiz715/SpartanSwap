@@ -102,8 +102,10 @@ class DBClass:
                 self.db.session.delete(item)
                 self.db.session.commit()
                 print(f"Ítem {item.name} deleted.")
+                return True
             else:
                 print(f"Ítem {item_id} not in db.")
+                return False
 
     def get_all_items(self, category=None):
         """Method to retrieve items from the database, optionally filtered by category"""
