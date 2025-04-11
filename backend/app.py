@@ -205,6 +205,7 @@ def get_user():
                 "phoneNumber": user.phone_number,
                 "emailAddresses": [user.email],
                 "profile_picture": user.profile_picture,
+                "is_admin": user.is_admin,
             }
             print(user_data)
             return jsonify(user_data)
@@ -234,6 +235,7 @@ def user_search(user_id):
                 "phoneNumber": user.phone_number,
                 "emailAddresses": [user.email],
                 "profile_picture": user.profile_picture,
+                "is_admin": user.is_admin,
             }
             print(user_data)
             return jsonify(user_data)
