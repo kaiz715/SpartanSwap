@@ -3,7 +3,7 @@ from flask_cors import CORS
 from database import db
 from db_class import User, Item
 from google.oauth2 import id_token
-from google.auth.transport import requests
+from google.auth.transport import requests as google_requests
 from environment import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from datetime import datetime
 from admin_list import admin_list
@@ -86,8 +86,9 @@ def validate():
 def signin():
     try:
         token = request.form["credential"]
+        print(token)
         idinfo = id_token.verify_oauth2_token(
-            token, requests.Request(), GOOGLE_CLIENT_ID
+            token, google_requests.Request(), GOOGLE_CLIENT_ID
         )
         print(idinfo)
 

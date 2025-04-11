@@ -12,6 +12,7 @@ export default function SignInWithGoogle() {
             setLoading(true);
             var bodyFormData = new FormData();
             bodyFormData.append("credential", response.credential);
+            console.log("Sending credential to backend:", response.credential);
             axios
                 .post(
                     "http://localhost:5001/signin",
