@@ -103,6 +103,7 @@ export default function ProfilePage() {
                 emails: emailAddresses,
                 profilePhoto, // This could be a temporary URL or a permanent URL if you've uploaded.
             };
+            console.log("Saving profile with payload:", payload);
             await axios.put("http://localhost:5001/api/user", payload, {
                 withCredentials: true,
             });
