@@ -25,7 +25,7 @@ export default function ProfilePage() {
 
         try {
             const response = await axios.post(
-                "http://spartanswapbackend.williserdman.com/api/upload-profile-photo",
+                "http://localhost:5001/api/upload-profile-photo",
                 formData,
                 {
                     withCredentials: true,
@@ -53,7 +53,7 @@ export default function ProfilePage() {
     const loadProfile = async () => {
         try {
             const response = await axios.get(
-                "http://spartanswapbackend.williserdman.com/api/user",
+                "http://localhost:5001/api/user",
                 {
                     withCredentials: true,
                 }
@@ -103,7 +103,7 @@ export default function ProfilePage() {
                 profilePhoto,
             };
             await axios.put(
-                "http://spartanswapbackend.williserdman.com/api/user",
+                "http://localhost:5001/api/user",
                 payload,
                 { withCredentials: true }
             );

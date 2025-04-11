@@ -107,7 +107,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
             try {
                 setIsLoading(true);
                 const response = await fetch(
-                    `http://spartanswapbackend.williserdman.com/api/products?category=${encodeURIComponent(
+                    `http://localhost:5001/api/products?category=${encodeURIComponent(
                         currentCategory
                     )}`
                 );

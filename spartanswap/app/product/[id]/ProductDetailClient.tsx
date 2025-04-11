@@ -36,7 +36,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
         const fetchSellerInfo = async (sellerId: number) => {
             try {
                 const response = await axios.get(
-                    `http://spartanswapbackend.williserdman.com/api/user_search/${sellerId.toString()}`,
+                    `http://localhost:5001/api/user_search/${sellerId.toString()}`,
                     {
                         withCredentials: true,
                     }

@@ -11,7 +11,7 @@ export default function TicketsPage() {
     const loadProfile = async () => {
         try {
             const response = await axios.get(
-                "http://spartanswapbackend.williserdman.com/api/user",
+                "http://localhost:5001/api/user",
                 {
                     withCredentials: true,
                 }

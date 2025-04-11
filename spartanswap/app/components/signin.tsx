@@ -14,7 +14,7 @@ export default function SignInWithGoogle() {
             bodyFormData.append("credential", response.credential);
             axios
                 .post(
-                    "http://spartanswapbackend.williserdman.com/signin",
+                    "http://localhost:5001/signin",
                     bodyFormData
                 )
                 .then((JWTresponse) => {
