@@ -6,6 +6,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from environment import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from datetime import datetime
+from admin_list import admin_list
 import jwt
 import os
 import requests
@@ -40,17 +41,22 @@ with app.app_context():
 # OAuth 2 client setup
 # client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
-def validate_session(token):
+def validate_session(token, is_admin=False):
     try:
         data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
         user = db_instance.get_user_by_sub(data["sub"])
         #print("right here willis: ", type(user))
         if user:
+            # Check if the user is an admin
+            if is_admin and not user.is_admin:
+                return False
+            
             user_data = {
                 "id": user.id,
                 "name": user.name,
                 "email": user.email,
                 "profile_picture": user.profile_picture,
+                "is_admin": user.is_admin,
             }
             #return user_data
             return user
@@ -96,6 +102,7 @@ def signin():
                     email=idinfo["email"],
                     name=idinfo["name"],
                     profile_picture=idinfo["picture"],
+                    is_admin=idinfo["email"] in admin_list,
                 )
             
             return_data["jwt_token"] = jwt.encode(
@@ -295,6 +302,21 @@ def add_listing():
     except Exception as e:
         db_instance.db.session.rollback()
         print(f"Error adding item: {str(e)}")
+        return jsonify({"error": "Database update failed"}), 500
+    
+@app.route("/api/delete_listing", methods=["DELETE"])
+def delete_listing():
+    token = request.cookies.get("jwt_token")
+    user = validate_session(token, is_admin=True)
+    
+    if not user:
+        return jsonify({"error": "Not logged in, or not Admin, or invalid token"}), 401
+
+    listing_data = request.json
+    
+    try:
+        db_instance.delete_item(listing_data["id"])
+    except Exception as e:
         return jsonify({"error": "Database update failed"}), 500
 
 @app.route("/api/upload-profile-photo", methods=["POST"])

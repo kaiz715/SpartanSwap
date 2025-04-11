@@ -32,7 +32,7 @@ class DBClass:
         return instance
         
 
-    def add_user(self, sub, email, name, profile_picture=None, gender=None, phone_number=None):
+    def add_user(self, sub, email, name, profile_picture=None, gender=None, phone_number=None, is_admin=False):
         """Method to add a user to the database"""
         with self.app.app_context():
             new_user = User(
@@ -41,7 +41,8 @@ class DBClass:
                 name=name,
                 profile_picture=profile_picture,
                 gender=gender,
-                phone_number=phone_number
+                phone_number=phone_number,
+                is_admin=is_admin
             )
             self.db.session.add(new_user)
             self.db.session.commit()
@@ -92,6 +93,17 @@ class DBClass:
             self.db.session.add(new_item)
             self.db.session.commit()
             print(f"Ítem {name} agregado correctamente.")
+            
+    def delete_item(self, item_id):
+        """Method to delete an item from the database"""
+        with self.app.app_context():
+            item = Item.query.get(item_id)
+            if item:
+                self.db.session.delete(item)
+                self.db.session.commit()
+                print(f"Ítem {item.name} deleted.")
+            else:
+                print(f"Ítem {item_id} not in db.")
 
     def get_all_items(self, category=None):
         """Method to retrieve items from the database, optionally filtered by category"""
@@ -139,6 +151,7 @@ class User(db.Model):
     gender = db.Column(db.String(50), nullable=True)
     phone_number = db.Column(db.String(20), nullable=True)
     account_create_date = db.Column(db.DateTime, default=datetime.utcnow)
+    is_admin = db.Column(db.Boolean, default=False)
 
     items = db.relationship("Item", backref="seller", lazy=True)
 
