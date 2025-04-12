@@ -7,7 +7,7 @@ from google.auth.transport import requests as google_requests
 from environment import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from datetime import datetime
 from admin_list import admin_list
-# from email_sender import send_email
+from email_sender import send_email
 import jwt
 import os
 import requests
@@ -95,6 +95,10 @@ def signin():
 
         # jsonify returns a response object
         return_data = {}
+        
+        
+        # if True:
+        # comment next 3 lines below and uncomment line above to test with noncwru emails
         if "hd" not in idinfo:
             return_data["CWRU_validated"] = False
         elif idinfo["hd"] == "case.edu":
@@ -106,11 +110,11 @@ def signin():
                     profile_picture=idinfo["picture"],
                     is_admin=idinfo["email"] in admin_list,
                 )
-                # send_email(
-                #     idinfo["email"],
-                #     "Welcome to SpartanSwap!",
-                #     "Thank you for signing up for SpartanSwap. We hope you enjoy the platform!",
-                # )
+                send_email(
+                    idinfo["email"],
+                    "Welcome to SpartanSwap!",
+                    "Thank you for signing up for SpartanSwap. We hope you enjoy the platform!",
+                )
             
             return_data["jwt_token"] = jwt.encode(
                 {
@@ -246,11 +250,12 @@ def user_search(user_id):
                 "is_admin": seller.is_admin,
             }
             print(user_data)
-            # send_email(
-            #     seller.email,
-            #     f"{seller.name} : Listing Search",
-            #     f"User {user.name} has searched for your listing. \nThank you for using SpartanSwap!",
-            # )
+            if user.id != seller.id:
+                send_email(
+                    seller.email,
+                    f"{seller.name} : Listing Search",
+                    f"User {user.name} has searched for your listing. \nThank you for using SpartanSwap!",
+                )
             return jsonify(user_data)
         else:
             return jsonify({"error": "User not found"}), 404

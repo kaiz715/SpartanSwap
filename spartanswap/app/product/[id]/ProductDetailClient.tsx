@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Heart, X } from "lucide-react";
 import { useFavorites } from "@/app/components/FavoritesContext";
+import Navbar from "@/app/components/Navbar";
 import axios from "axios";
 
 export interface Product {
@@ -128,55 +129,9 @@ export default function ProductDetailClient({ id }: { id: string }) {
     return (
         <div className="bg-[#EAF5FA] min-h-screen relative">
             {/* Navbar */}
-            <motion.nav
-                className="flex items-center justify-between px-4 h-16 border-b bg-white"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-            >
-                <div className="flex items-center relative top-[-4px]">
-                    <Link href="/">
-                        <Image
-                            src="/logo.png"
-                            alt="SpartanSwap Logo"
-                            width={100}
-                            height={100}
-                            priority={true}
-                            className="object-contain cursor-pointer"
-                        />
-                    </Link>
-                </div>
-                <ul className="hidden md:flex flex-grow justify-center">
-                    {[
-                        { name: "Home", href: "/" },
-                        { name: "Home Goods", href: "/homegoods" },
-                        { name: "Clothes", href: "/clothes" },
-                        { name: "Rental", href: "/rental" },
-                        { name: "Tickets", href: "/tickets" },
-                    ].map((tab) => (
-                        <li key={tab.href}>
-                            <Link
-                                href={tab.href}
-                                className={`whitespace-nowrap text-sm lg:text-base transition-all mx-1 lg:mx-3 ${
-                                    pathname === tab.href
-                                        ? "bg-blue-100 text-blue-900 font-bold px-2 py-2 lg:px-4 rounded-md"
-                                        : "text-gray-600 hover:text-gray-900 px-2 py-2 lg:px-4"
-                                }`}
-                            >
-                                {tab.name}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-                <div className="flex space-x-2 lg:space-x-4">
-                    <button className="border border-blue-600 text-blue-600 px-2 py-1 lg:px-4 lg:py-2 rounded text-sm lg:text-base hover:bg-blue-50">
-                        Create Listing
-                    </button>
-                    <button className="bg-blue-600 text-white px-2 py-1 lg:px-4 lg:py-2 rounded text-sm lg:text-base hover:bg-blue-700">
-                        Sign In
-                    </button>
-                </div>
-            </motion.nav>
+            <div className="sticky top-0 z-50">
+                <Navbar />
+            </div>
 
             {/* Main Product Detail Content */}
             <div className="max-w-6xl mx-auto py-12 px-4">
