@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { Heart, X } from "lucide-react";
 import { useFavorites } from "@/app/components/FavoritesContext";
 import Navbar from "@/app/components/Navbar";
+import { useCookies } from "react-cookie";
 import axios from "axios";
 
 export interface Product {
@@ -24,7 +25,7 @@ export interface Product {
     isCustom?: boolean;
 }
 
-export default function ProductDetailClient({ id }: { id: string }) {
+export default function ProductDetailClient({ id: product_id }: { id: string }) {
     const pathname = usePathname();
     const [product, setProduct] = useState<Product | null>(null);
     const [sellerName, setSellerName] = useState("");
@@ -34,9 +35,43 @@ export default function ProductDetailClient({ id }: { id: string }) {
     const [showFavorites, setShowFavorites] = useState<boolean>(false);
     const [sellerID, setSellerID] = useState("");
     const [isAdmin, setIsAdmin] = useState(false);
-    //const [id, setId] = useState("");
+    const [cookies] = useCookies(["jwt_token"]);
+    const isLoggedIn = Boolean(cookies.jwt_token);
+
+    const [profilePicture, setProfilePicture] = useState("/profileIcon.png");
+    const [fullName, setFullName] = useState("");
+    const [gender, setGender] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [emailAddresses, setEmailAddresses] = useState<string[]>([]);
+    const [id, setId] = useState("");
 
     useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await axios.get(
+                    "http://localhost:5001/api/user",
+                    {
+                        withCredentials: true,
+                    }
+                );
+                setFullName(response.data.name || "");
+                setGender(response.data.gender || "");
+                setPhoneNumber(response.data.phoneNumber || "");
+                setEmailAddresses(response.data.emailAddresses || []);
+                setId(response.data.id || "");
+                if (response.data.profile_picture) {
+                    setProfilePicture(response.data.profile_picture);
+                }
+                if (response.data.is_admin) setIsAdmin(true);
+            } catch (error) {
+                console.error("Failed to load profile picture", error);
+            }
+        };
+        
+        if (isLoggedIn) {
+            fetchProfile();
+        }
+        
         const fetchSellerInfo = async (sellerId: number) => {
             try {
                 const response = await axios.get(
@@ -60,14 +95,14 @@ export default function ProductDetailClient({ id }: { id: string }) {
         const data = localStorage.getItem("listings");
         if (data) {
             const listings: Product[] = JSON.parse(data);
-            const found = listings.find((p) => p.id === Number(id));
+            const found = listings.find((p) => p.id === Number(product_id));
             setProduct(found || null);
             console.log("Product found:", found);
             if (found?.sellerId !== undefined) {
                 fetchSellerInfo(found.sellerId);
             }
         }
-    }, [id]);
+    }, [product_id]);
 
     const isFavorited = product
         ? favorites.some((fav) => fav.id === product.id)
@@ -228,7 +263,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
                             </Link>
                             {/* Delete Listings button */}
 
-                            {(isAdmin || sellerID == id) && (
+                            {(isAdmin || sellerID == product_id) && (
                                 <div className="mt-4">
                                     {" "}
                                     <button

@@ -36,8 +36,9 @@ export default function Navbar() {
     const [gender, setGender] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [emailAddresses, setEmailAddresses] = useState<string[]>([]);
-    const [newEmail, setNewEmail] = useState("");
     const [id, setId] = useState("");
+    const [newEmail, setNewEmail] = useState("");
+
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
