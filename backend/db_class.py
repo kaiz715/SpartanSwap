@@ -115,6 +115,13 @@ class DBClass:
                 query = query.filter_by(category=category)
             items = query.all()
             return items
+        
+    def get_items_by_id(self, item_id):
+        """Method to retrieve an item by ID from the database"""
+        with self.app.app_context():
+            item = Item.query.filter_by(id=item_id).first()
+            return item
+    
     def update_user(self, sub, email=None, name=None, profile_picture=None, gender=None, phone_number=None):
         """Update a user's information in the database"""
         with self.app.app_context():

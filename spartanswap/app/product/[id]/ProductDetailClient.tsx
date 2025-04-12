@@ -97,7 +97,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
                 const response = await axios.delete(
                     "http://localhost:5001/api/delete_listing",
                     {
-                        data: { id: product.id },
+                        data: { product_id: product.id },
                         withCredentials: true,
                     }
                 );

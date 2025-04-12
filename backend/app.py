@@ -7,6 +7,7 @@ from google.auth.transport import requests as google_requests
 from environment import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from datetime import datetime
 from admin_list import admin_list
+# from email_sender import send_email
 import jwt
 import os
 import requests
@@ -105,10 +106,16 @@ def signin():
                     profile_picture=idinfo["picture"],
                     is_admin=idinfo["email"] in admin_list,
                 )
+                # send_email(
+                #     idinfo["email"],
+                #     "Welcome to SpartanSwap!",
+                #     "Thank you for signing up for SpartanSwap. We hope you enjoy the platform!",
+                # )
             
             return_data["jwt_token"] = jwt.encode(
                 {
                     "sub": idinfo["sub"],
+                    "id": db_instance.get_user_by_sub(idinfo["sub"]).id,
                     "name": idinfo["name"],
                     "iat": datetime.now().timestamp(),
                     "exp": datetime.now().timestamp() + 604800,
@@ -227,18 +234,23 @@ def user_search(user_id):
 
     try:
         print(user_id)
-        user = db_instance.get_user_by_id(user_id)
-        if user:
+        seller = db_instance.get_user_by_id(user_id)
+        if seller:
             user_data = {
-                "id": user.id,
-                "name": user.name,
-                "gender": user.gender,
-                "phoneNumber": user.phone_number,
-                "emailAddresses": [user.email],
-                "profile_picture": user.profile_picture,
-                "is_admin": user.is_admin,
+                "id": seller.id,
+                "name": seller.name,
+                "gender": seller.gender,
+                "phoneNumber": seller.phone_number,
+                "emailAddresses": [seller.email],
+                "profile_picture": seller.profile_picture,
+                "is_admin": seller.is_admin,
             }
             print(user_data)
+            # send_email(
+            #     seller.email,
+            #     f"{seller.name} : Listing Search",
+            #     f"User {user.name} has searched for your listing. \nThank you for using SpartanSwap!",
+            # )
             return jsonify(user_data)
         else:
             return jsonify({"error": "User not found"}), 404
@@ -310,15 +322,25 @@ def add_listing():
 @app.route("/api/delete_listing", methods=["DELETE"])
 def delete_listing():
     token = request.cookies.get("jwt_token")
-    user = validate_session(token, is_admin=True)
+    user = validate_session(token)
     
     if not user:
-        return jsonify({"error": "Not logged in, or not Admin, or invalid token"}), 401
+        return jsonify({"error": "Not logged in, or invalid token"}), 401
 
     listing_data = request.json
+    product_id = listing_data.get("product_id")
+    if not product_id:
+        return jsonify({"error": "Product ID is required"}), 400
+    
+    seller_id = db_instance.get_items_by_id(product_id).seller_id
+    
+    # Check if the user is an admin
+    if not user.is_admin and user.id != seller_id:
+        return jsonify({"error": "Unauthorized"}), 403
+    
     
     try:
-        if db_instance.delete_item(listing_data["id"]):
+        if db_instance.delete_item(listing_data["product_id"]):
             return jsonify({"message": "Listing Deleted Successfully"}), 200
         else:
             return jsonify({"error": "Listing not found"}), 404
