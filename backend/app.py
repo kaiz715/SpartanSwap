@@ -250,12 +250,12 @@ def user_search(user_id):
                 "is_admin": seller.is_admin,
             }
             print(user_data)
-            if user.id != seller.id:
-                # send_email(
-                #     seller.email,
-                #     f"{seller.name} : Listing Search",
-                #     f"User {user.name} has searched for your listing. \nThank you for using SpartanSwap!",
-                # )
+            # if user.id != seller.id:
+            #     send_email(
+            #         seller.email,
+            #         f"{seller.name} : Listing Search",
+            #         f"User {user.name} has searched for your listing. \nThank you for using SpartanSwap!",
+            #     )
             return jsonify(user_data)
         else:
             return jsonify({"error": "User not found"}), 404
