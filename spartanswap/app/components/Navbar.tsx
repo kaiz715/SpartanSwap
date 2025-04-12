@@ -38,6 +38,7 @@ export default function Navbar() {
     const [emailAddresses, setEmailAddresses] = useState<string[]>([]);
     const [newEmail, setNewEmail] = useState("");
     const [id, setId] = useState("");
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -56,6 +57,7 @@ export default function Navbar() {
                 if (response.data.profile_picture) {
                     setProfilePicture(response.data.profile_picture);
                 }
+                if (response.data.is_admin) setIsAdmin(true);
             } catch (error) {
                 console.error("Failed to load profile picture", error);
             }

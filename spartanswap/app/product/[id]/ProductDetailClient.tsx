@@ -31,6 +31,9 @@ export default function ProductDetailClient({ id }: { id: string }) {
     const [sellerPhone, setSellerPhone] = useState("");
     const { favorites, toggleFavorite } = useFavorites();
     const [showFavorites, setShowFavorites] = useState<boolean>(false);
+    const [sellerID, setSellerID] = useState("");
+    const [isAdmin, setIsAdmin] = useState(false);
+    //const [id, setId] = useState("");
 
     useEffect(() => {
         const fetchSellerInfo = async (sellerId: number) => {
@@ -45,6 +48,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
                     setSellerName(response.data.name);
                     setSellerEmail(response.data.emailAddresses[0]);
                     setSellerPhone(response.data.phoneNumber);
+                    setSellerID(response.data.id);
                     console.log("Seller info fetched:", response.data);
                 }
             } catch (error) {
@@ -85,6 +89,41 @@ export default function ProductDetailClient({ id }: { id: string }) {
             </div>
         );
     }
+
+    const handleDelete = async () => {
+        if (!product) return;
+        if (window.confirm("Are you sure you want to delete this listing?")) {
+            try {
+                const response = await axios.delete(
+                    "http://localhost:5001/api/delete_listing",
+                    {
+                        data: { id: product.id },
+                        withCredentials: true,
+                    }
+                );
+                if (response.status === 200) {
+                    // Remove from localStorage
+                    const data = localStorage.getItem("listings");
+                    if (data) {
+                        const listings: Product[] = JSON.parse(data);
+                        const updatedListings = listings.filter(
+                            (p) => p.id !== product.id
+                        );
+                        localStorage.setItem(
+                            "listings",
+                            JSON.stringify(updatedListings)
+                        );
+                    }
+                    // Redirect to home or category
+                    window.location.href =
+                        categoryToUrl[product.category] || "/";
+                }
+            } catch (error) {
+                console.error("Error deleting listing:", error);
+                alert("Failed to delete listing. You may not have permission.");
+            }
+        }
+    };
 
     return (
         <div className="bg-[#EAF5FA] min-h-screen relative">
@@ -232,6 +271,19 @@ export default function ProductDetailClient({ id }: { id: string }) {
                             >
                                 Back to Listings
                             </Link>
+                            {/* Delete Listings button */}
+
+                            {(isAdmin || sellerID == id) && (
+                                <div className="mt-4">
+                                    {" "}
+                                    <button
+                                        onClick={handleDelete}
+                                        className="w-full bg-red-600 text-white px-3 py-3 rounded-lg font-semibold hover:bg-red-700 transition"
+                                    >
+                                        Delete Listing{" "}
+                                    </button>{" "}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
