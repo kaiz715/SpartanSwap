@@ -52,7 +52,7 @@ const colorMap: Record<string, string> = {
     Purple: "#800080",
     Beige: "#F5F5DC",
     Cream: "#FFFDD0",
-    background:
+    Multi:
         "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)",
 };
 

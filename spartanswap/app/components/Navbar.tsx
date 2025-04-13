@@ -268,13 +268,15 @@ export default function Navbar() {
                         </button>
                     ) : (
                         <Link href="/profile">
+                            <div className="w-12 h-12 rounded-full overflow-hidden">
                             <Image
-                                src={profilePicture}
-                                alt="Profile"
-                                width={40}
-                                height={40}
-                                className="object-cover cursor-pointer rounded-full"
+                              src={profilePicture}
+                              alt="Profile"
+                              width={40}
+                              height={40}
+                             className="object-cover w-full h-full rounded-full cursor-pointer"
                             />
+                          </div>
                         </Link>
                     )}
                 </div>
