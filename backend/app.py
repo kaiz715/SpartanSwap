@@ -392,6 +392,37 @@ def upload_listing_photo():
     else:
         return jsonify({"error": "Failed to upload to imgbb"}), 500
     
+@app.route("/api/products/<int:product_id>", methods=["PUT"])
+def update_product(product_id):
+    token = request.cookies.get("jwt_token")
+    user = validate_session(token)
+    if not user:
+        return jsonify({"error": "Not logged in"}), 401
+
+    item = db_instance.get_items_by_id(product_id)
+    if not item:
+        return jsonify({"error": "Item not found"}), 404
+
+    # Only creator or admin can edit 
+    if not user.is_admin and user.id != item.seller_id:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    data = request.json
+    item.name = data.get("name", item.name)
+    item.description = data.get("description", item.description)
+    item.price = data.get("price", item.price)
+    item.category = data.get("category", item.category)
+    item.item_type = data.get("type", item.item_type)
+    item.color = data.get("color", item.color)
+    item.image_url = data.get("image", item.image_url)
+
+    try:
+        db_instance.db.session.commit()
+        return jsonify({"message": "Listing updated"}), 200
+    except Exception as e:
+        db_instance.db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
 # Crear las tablas en la base de datos con manejo de errores
 # Making the datatables with error handling
 if __name__ == "__main__":
