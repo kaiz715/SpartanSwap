@@ -118,7 +118,8 @@ export default function ProfilePage() {
 
   const deleteListing = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:5001/api/products/${id}`, {
+      await axios.delete("http://localhost:5001/api/delete_listing", {
+        data: { product_id: id },
         withCredentials: true,
       });
       setMyListings((prev) => prev.filter((p) => p.id !== id));
@@ -126,6 +127,7 @@ export default function ProfilePage() {
       console.error(e);
     }
   };
+  
 
   if (!isLoggedIn) {
     return (
