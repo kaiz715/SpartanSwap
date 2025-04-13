@@ -107,12 +107,14 @@ class DBClass:
                 print(f"Ítem {item_id} not in db.")
                 return False
 
-    def get_all_items(self, category=None):
+    def get_all_items(self, category=None, seller_id=None):
         """Method to retrieve items from the database, optionally filtered by category"""
         with self.app.app_context():
             query = Item.query
             if category:
                 query = query.filter_by(category=category)
+            if seller_id:
+                query = query.filter_by(seller_id=seller_id)
             items = query.all()
             return items
         
@@ -145,6 +147,23 @@ class DBClass:
             self.db.session.commit()
             print(f"User {user.name} updated successfully.")
             return user
+        
+    def update_item(self, item_id, new_data):
+        """Update an item's information in the database"""
+        with self.app.app_context():
+            item = Item.query.filter_by(id=item_id).first()
+            if not item:
+                print(f"Item with ID {item_id} not found.")
+                return None
+
+            # Update provided fields
+            for key, value in new_data.items():
+                if hasattr(item, key):
+                    setattr(item, key, value)
+
+            self.db.session.commit()
+            print(f"Item {item.name} updated successfully.")
+            return item
 
 
 

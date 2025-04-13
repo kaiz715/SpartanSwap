@@ -67,6 +67,7 @@ export default function ProfilePage() {
         `http://localhost:5001/api/products?sellerId=${u.id}`,
         { withCredentials: true }
       );
+      console.log(listResp.data);
       setMyListings(listResp.data as Product[]);
     } catch (err) {
       console.error(err);
@@ -119,6 +120,19 @@ export default function ProfilePage() {
   const deleteListing = async (id: number) => {
     try {
       await axios.delete("http://localhost:5001/api/delete_listing", {
+        data: { product_id: id },
+        withCredentials: true,
+      });
+      console.log(`Deleted listing with ID: ${id}`);
+      setMyListings((prev) => prev.filter((p) => p.id !== id));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const editListing = async (id: number) => {
+    try {
+      await axios.put(`http://localhost:5001/api/products/${id}`, {
         data: { product_id: id },
         withCredentials: true,
       });
@@ -390,6 +404,7 @@ function EditModal({
   };
 
   const save = async () => {
+    console.log("Saving product", form);
     await axios.put(
       `http://localhost:5001/api/products/${product.id}`,
       form,

@@ -12,6 +12,7 @@ import jwt
 import os
 import requests
 import base64
+import json
 
 
 from flask import Flask, jsonify, request
@@ -175,8 +176,12 @@ with app.app_context():
 @app.route("/api/products", methods=["GET"])
 def get_products():
     print("listings got")
-    category = request.args.get('category')
-    items = db_instance.get_all_items(category=category)
+    seller_id = request.args.get("sellerId")
+    if seller_id:
+        items = db_instance.get_all_items(seller_id=seller_id)
+    else:
+        category = request.args.get('category')
+        items = db_instance.get_all_items(category=category)
     
     products = []
     for item in items:
@@ -406,21 +411,13 @@ def update_product(product_id):
     # Only creator or admin can edit 
     if not user.is_admin and user.id != item.seller_id:
         return jsonify({"error": "Unauthorized"}), 403
-
     data = request.json
-    item.name = data.get("name", item.name)
-    item.description = data.get("description", item.description)
-    item.price = data.get("price", item.price)
-    item.category = data.get("category", item.category)
-    item.item_type = data.get("type", item.item_type)
-    item.color = data.get("color", item.color)
-    item.image_url = data.get("image", item.image_url)
-
+    print(data)
     try:
-        db_instance.db.session.commit()
+        db_instance.update_item(product_id, data)
         return jsonify({"message": "Listing updated"}), 200
     except Exception as e:
-        db_instance.db.session.rollback()
+        print("exception:", e)
         return jsonify({"error": str(e)}), 500
 
 # Crear las tablas en la base de datos con manejo de errores
