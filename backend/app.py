@@ -269,13 +269,13 @@ def update_user():
         return jsonify({"error": "Not logged in or invalid token"}), 401
 
     profile_data = request.json
-    
+    print(profile_data)
     try:
         # Update fields directly without app context wrapper
         user.name = profile_data.get("name", user.name)
         user.gender = profile_data.get("gender", user.gender)
         user.phone_number = profile_data.get("phoneNumber", user.phone_number)  # Note: phoneNumber vs phone_number
-        user.profile_picture = profile_data.get("profilePhoto", user.profile_picture)
+        user.profile_picture = profile_data.get("profile_picture", user.profile_picture)
 
         # Explicitly add to session and commit
         db_instance.db.session.add(user)

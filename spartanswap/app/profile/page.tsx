@@ -90,6 +90,7 @@ export default function ProfilePage() {
       { withCredentials: true }
     );
     setProfilePhoto(r.data.url);
+    saveProfile();
   };
 
   const saveProfile = async () => {
@@ -145,7 +146,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="bg-[#EAF5FA] min-h-screen p-4 text-gray-700">
+    <div className="bg-[#EAF5FA] min-h-screen p-4 text-gray-700" >
       <Navbar />
 
       <div className="max-w-5xl mx-auto mt-8 p-6 bg-white shadow-md rounded-md">
