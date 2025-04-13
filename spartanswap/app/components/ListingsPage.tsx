@@ -259,7 +259,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
             {/* Listings Grid & Filters */}
             <div className="grid grid-cols-4 gap-6 max-w-7xl mx-auto px-6 mt-6">
                 {/* Filters Column */}
-                <div className="col-span-1 bg-white p-4 shadow rounded-md flex flex-col space-y-4">
+                <div className="col-span-1 self-start bg-white p-4 shadow rounded-md flex flex-col space-y-4">
                     <h3 className="text-lg font-semibold text-gray-700">
                         Filters
                     </h3>

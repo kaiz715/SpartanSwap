@@ -1,3 +1,4 @@
+// app/profile/page.tsx
 "use client";
 
 import { useCookies } from "react-cookie";
@@ -27,6 +28,7 @@ export default function ProfilePage() {
   const isLoggedIn = Boolean(cookies.jwt_token);
   const router = useRouter();
 
+  // Profile state
   const [fullName, setFullName] = useState("");
   const [gender, setGender] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -35,60 +37,39 @@ export default function ProfilePage() {
   const [saveStatus, setSaveStatus] = useState("");
   const [userId, setUserId] = useState<string>("");
 
+  // Tabs & listings
   const [activeTab, setActiveTab] = useState<"profile" | "listings">("profile");
   const [myListings, setMyListings] = useState<Product[]>([]);
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
 
-  const handleProfilePhotoUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = (reader.result as string).split(",")[1];
-      try {
-        const formData = new FormData();
-        formData.append("image", base64);
-        const response = await axios.post(
-          "https://api.imgbb.com/1/upload?key=aaeb2e69efbfbf1b37e059229378b797",
-          formData
-        );
-        const data = response.data as { data: { url: string } };
-        setProfilePhoto(data.data.url);
-      } catch (error) {
-        console.error("Failed to upload image:", error);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
+  // Load profile & listings
   const loadProfileAndListings = async () => {
     try {
       const resp = await axios.get("http://localhost:5001/api/user", {
         withCredentials: true,
       });
-      const data = resp.data as {
-        id?: string;
-        name?: string;
-        gender?: string;
-        phoneNumber?: string;
-        emailAddresses?: string[];
+      const u = resp.data as {
+        id: string;
+        name: string;
+        gender: string;
+        phoneNumber: string;
+        emailAddresses: string[];
         profile_picture?: string;
       };
-      setUserId(data.id || "");
-      setFullName(data.name || "");
-      setGender(data.gender || "");
-      setPhoneNumber(data.phoneNumber || "");
-      setEmailAddresses(data.emailAddresses || []);
-      if (data.profile_picture) setProfilePhoto(data.profile_picture);
+      setUserId(u.id);
+      setFullName(u.name);
+      setGender(u.gender);
+      setPhoneNumber(u.phoneNumber);
+      setEmailAddresses(u.emailAddresses);
+      if (u.profile_picture) setProfilePhoto(u.profile_picture);
 
-      if (data.id) {
-        const listResp = await axios.get(
-          `http://localhost:5001/api/products?sellerId=${data.id}`,
-          { withCredentials: true }
-        );
-        setMyListings(listResp.data as Product[]);
-      }
-    } catch (e) {
-      console.error(e);
+      const listResp = await axios.get(
+        `http://localhost:5001/api/products?sellerId=${u.id}`,
+        { withCredentials: true }
+      );
+      setMyListings(listResp.data as Product[]);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -96,24 +77,38 @@ export default function ProfilePage() {
     if (isLoggedIn) loadProfileAndListings();
   }, [isLoggedIn]);
 
+  // Handlers
+  const handleProfilePhotoUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append("image", file);
+    const r = await axios.post(
+      "http://localhost:5001/api/upload-profile-photo",
+      fd,
+      { withCredentials: true }
+    );
+    setProfilePhoto(r.data.url);
+  };
+
   const saveProfile = async () => {
     try {
-      const payload = {
-        name: fullName,
-        gender,
-        phoneNumber,
-        emails: emailAddresses,
-        profilePhoto,
-      };
-      await axios.put("http://localhost:5001/api/user", payload, {
-        withCredentials: true,
-      });
-      setSaveStatus("Profile saved successfully!");
-    } catch (error) {
-      console.error(error);
+      await axios.put(
+        "http://localhost:5001/api/user",
+        {
+          name: fullName,
+          gender,
+          phoneNumber,
+          emails: emailAddresses,
+          profile_picture: profilePhoto,
+        },
+        { withCredentials: true }
+      );
+      setSaveStatus("Profile saved!");
+    } catch {
       setSaveStatus("Error saving profile.");
     }
-    setTimeout(() => setSaveStatus(""), 3000);
+    setTimeout(() => setSaveStatus(""), 2000);
   };
 
   const signOut = () => {
@@ -121,15 +116,14 @@ export default function ProfilePage() {
     window.location.href = "/";
   };
 
-  const deleteListing = async (listingId: number) => {
+  const deleteListing = async (id: number) => {
     try {
-      await axios.delete(
-        `http://localhost:5001/api/products/${listingId}`,
-        { withCredentials: true }
-      );
-      setMyListings((prev) => prev.filter((l) => l.id !== listingId));
-    } catch (error) {
-      console.error("Failed to delete listing:", error);
+      await axios.delete(`http://localhost:5001/api/products/${id}`, {
+        withCredentials: true,
+      });
+      setMyListings((prev) => prev.filter((p) => p.id !== id));
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -138,7 +132,7 @@ export default function ProfilePage() {
       <div className="flex flex-col items-center justify-center h-screen text-gray-700">
         <p>You are not logged in.</p>
         <Link href="/">
-          <button aria-label="Go back home" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
+          <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
             Go Back Home
           </button>
         </Link>
@@ -151,9 +145,7 @@ export default function ProfilePage() {
       <Navbar />
 
       <div className="max-w-5xl mx-auto mt-8 p-6 bg-white shadow-md rounded-md">
-        <h1 className="text-xl font-bold mb-4">
-          Welcome, {fullName || "User"}
-        </h1>
+        <h1 className="text-xl font-bold mb-4">Welcome, {fullName}</h1>
 
         <div className="flex border-b mb-6">
           <button
@@ -180,12 +172,13 @@ export default function ProfilePage() {
 
         {activeTab === "profile" ? (
           <>
+            {/* Profile Tab */}
             <div className="flex items-center mb-6 space-x-4">
               <label htmlFor="profile-upload" className="cursor-pointer">
                 <div className="w-20 h-20 rounded-full overflow-hidden">
                   <Image
                     src={profilePhoto}
-                    alt="User Profile Picture"
+                    alt="Profile"
                     width={80}
                     height={80}
                     className="object-cover w-full h-full rounded-full"
@@ -201,10 +194,8 @@ export default function ProfilePage() {
                 />
               </label>
               <div>
-                <p className="font-semibold" aria-label="Email addresses">
-                  {emailAddresses.join(", ")}
-                </p>
-                <p aria-label="Seller ID">Seller ID: {userId}</p>
+                <p className="font-semibold">{emailAddresses.join(", ")}</p>
+                <p>Seller ID: {userId}</p>
               </div>
             </div>
 
@@ -221,18 +212,6 @@ export default function ProfilePage() {
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full border p-2 rounded mt-1"
                 />
-              </div>
-              <div>
-                <label htmlFor="email-address" className="block">
-                  Email Addresses
-                </label>
-                <div id="email-address">
-                  {emailAddresses.map((email, idx) => (
-                    <p key={idx} className="mt-1">
-                      {email}
-                    </p>
-                  ))}
-                </div>
               </div>
               <div>
                 <label htmlFor="gender" className="block">
@@ -265,66 +244,274 @@ export default function ProfilePage() {
             <div className="mt-6 flex gap-4">
               <button
                 onClick={saveProfile}
-                aria-label="Save profile"
-                className="w-1/2 bg-blue-600 text-white px-4 py-2 rounded-md text-center"
+                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded"
               >
                 Save Profile
               </button>
               <button
                 onClick={signOut}
-                aria-label="Sign out"
-                className="w-1/2 bg-red-600 text-white px-4 py-2 rounded-md text-center"
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded"
               >
                 Sign Out
               </button>
             </div>
-            {saveStatus && <p className="mt-2 text-center">{saveStatus}</p>}
+            {saveStatus && <p className="mt-2">{saveStatus}</p>}
           </>
         ) : (
-          <div className="max-h-96 overflow-y-auto space-y-4" aria-label="My Listings Panel">
-            {myListings.length === 0 ? (
-              <p>You have no active listings.</p>
-            ) : (
-              myListings.map((listing) => (
-                <div
-                  key={listing.id}
-                  className="flex items-center justify-between bg-gray-50 p-4 rounded"
-                >
-                  <Link
-                    href={`/product/${listing.id}`}
-                    aria-label={`View listing ${listing.name}`}
-                    className="flex items-center space-x-4"
+          <>
+            {/* My Listings Tab */}
+            <h2 className="text-2xl mb-4">Your Listings</h2>
+            <div className="space-y-4 max-h-96 overflow-auto">
+              {myListings.length === 0 ? (
+                <p>You have no active listings.</p>
+              ) : (
+                myListings.map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between bg-gray-50 p-4 rounded"
                   >
-                    <Image
-                      src={listing.image}
-                      alt={listing.name}
-                      width={60}
-                      height={60}
-                      className="object-cover rounded"
-                    />
-                    <span className="font-medium">{listing.name}</span>
-                  </Link>
-                  <div className="space-x-2">
-                    <button
-                      onClick={() => router.push(`/product/${listing.id}/edit`)}
-                      aria-label={`Edit listing ${listing.name}`}
-                      className="px-3 py-1 bg-blue-500 text-white rounded"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => deleteListing(listing.id)}
-                      aria-label={`Delete listing ${listing.name}`}
-                      className="px-3 py-1 bg-red-500 text-white rounded"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex items-center space-x-4">
+                      <Image
+                        src={p.image}
+                        alt={p.name}
+                        width={60}
+                        height={60}
+                        className="rounded"
+                      />
+                      <button
+                        onClick={() => router.push(`/product/${p.id}`)}
+                        className="font-medium text-left"
+                      >
+                        {p.name}
+                      </button>
+                    </div>
+                    <div className="space-x-2">
+                      <button
+                        onClick={() => setEditProduct(p)}
+                        className="px-3 py-1 bg-blue-500 text-white rounded"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteListing(p.id)}
+                        className="px-3 py-1 bg-red-500 text-white rounded"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
+                ))
+              )}
+            </div>
+          </>
         )}
+      </div>
+
+      {/* Edit Modal */}
+      {editProduct && (
+        <EditModal
+          product={editProduct}
+          onClose={() => setEditProduct(null)}
+          onSaved={() => {
+            setEditProduct(null);
+            loadProfileAndListings();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function EditModal({
+  product,
+  onClose,
+  onSaved,
+}: {
+  product: Product;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const categoryOptions = ["Home Goods", "Clothes", "Tickets", "Rental"] as const;
+  type Category = typeof categoryOptions[number];
+  const typeOptions: Record<Category, string[]> = {
+    "Home Goods": [
+      "Decor",
+      "Appliances",
+      "Furniture",
+      "Lighting",
+      "Electronics",
+      "Outdoor",
+      "Miscellaneous",
+    ],
+    Clothes: ["Men", "Women", "Kids", "Accessories", "Footwear"],
+    Tickets: ["Concert", "Sport", "Theatre", "Festival", "Other"],
+    Rental: ["Apartment", "House", "Room", "Office", "Other"],
+  };
+
+  const colorMap: Record<string, string> = {
+    Green: "#008000",
+    Brown: "#8b4513",
+    Gray: "#808080",
+    Blue: "#0000FF",
+    Red: "#FF0000",
+    Black: "#000000",
+    White: "#FFFFFF",
+    Yellow: "#FFFF00",
+    Orange: "#FFA500",
+    Purple: "#800080",
+    Beige: "#F5F5DC",
+    Cream: "#FFFDD0",
+    Multi:
+      "linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)",
+  };
+
+  const [form, setForm] = useState({
+    name: product.name,
+    description: product.description || "",
+    price: product.price,
+    category: product.category as Category,
+    type: product.type,
+    color: product.color,
+    image: product.image,
+  });
+
+  const handleFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+    const fd = new FormData();
+    fd.append("image", e.target.files[0]);
+    const resp = await axios.post(
+      "http://localhost:5001/api/upload-listing-photo",
+      fd,
+      { withCredentials: true }
+    );
+    setForm((f) => ({ ...f, image: resp.data.url }));
+  };
+
+  const save = async () => {
+    await axios.put(
+      `http://localhost:5001/api/products/${product.id}`,
+      form,
+      { withCredentials: true }
+    );
+    onSaved();
+  };
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded-lg max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left: Image */}
+        <div className="flex flex-col items-center">
+          <Image
+            src={form.image}
+            alt={form.name}
+            width={400}
+            height={400}
+            className="object-cover rounded-md mb-4"
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFile}
+            aria-label="Upload new image"
+          />
+        </div>
+        {/* Right: Fields */}
+        <div className="flex flex-col space-y-4">
+          <label className="block">
+            Title
+            <input
+              type="text"
+              value={form.name}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, name: e.target.value }))
+              }
+              className="w-full border p-2 rounded mt-1"
+            />
+          </label>
+          <label className="block">
+            Description
+            <textarea
+              value={form.description}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, description: e.target.value }))
+              }
+              className="w-full border p-2 rounded mt-1"
+            />
+          </label>
+          <label className="block">
+            Price
+            <input
+              type="number"
+              value={form.price}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, price: Number(e.target.value) }))
+              }
+              className="w-full border p-2 rounded mt-1"
+            />
+          </label>
+          <label className="block">
+            Category
+            <select
+              value={form.category}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  category: e.target.value as Category,
+                  type: "",
+                }))
+              }
+              className="w-full border p-2 rounded mt-1"
+            >
+              {categoryOptions.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            Type
+            <select
+              value={form.type}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, type: e.target.value }))
+              }
+              className="w-full border p-2 rounded mt-1"
+            >
+              <option value="">Select type</option>
+              {typeOptions[form.category].map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            Color
+            <select
+              value={form.color}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, color: e.target.value }))
+              }
+              className="w-full border p-2 rounded mt-1"
+            >
+              {Object.keys(colorMap).map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="flex justify-end space-x-2 mt-4 col-span-full">
+            <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
+              Cancel
+            </button>
+            <button onClick={save} className="px-4 py-2 bg-blue-600 text-white rounded">
+              Save
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
