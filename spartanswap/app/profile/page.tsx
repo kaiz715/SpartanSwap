@@ -129,18 +129,6 @@ export default function ProfilePage() {
       console.error(e);
     }
   };
-
-  const editListing = async (id: number) => {
-    try {
-      await axios.put(`http://localhost:5001/api/products/${id}`, {
-        data: { product_id: id },
-        withCredentials: true,
-      });
-      setMyListings((prev) => prev.filter((p) => p.id !== id));
-    } catch (e) {
-      console.error(e);
-    }
-  };
   
 
   if (!isLoggedIn) {

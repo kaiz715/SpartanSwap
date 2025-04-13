@@ -88,11 +88,9 @@ def validate():
 def signin():
     try:
         token = request.form["credential"]
-        print(token)
         idinfo = id_token.verify_oauth2_token(
             token, google_requests.Request(), GOOGLE_CLIENT_ID
         )
-        print(idinfo)
 
         # jsonify returns a response object
         return_data = {}
@@ -175,7 +173,6 @@ with app.app_context():
 
 @app.route("/api/products", methods=["GET"])
 def get_products():
-    print("listings got")
     seller_id = request.args.get("sellerId")
     if seller_id:
         items = db_instance.get_all_items(seller_id=seller_id)
@@ -185,7 +182,6 @@ def get_products():
     
     products = []
     for item in items:
-        print(item.name)
         product_data = {
             "id": item.id,
             "sellerId": item.seller_id,
@@ -211,9 +207,7 @@ def get_user():
 
     try:
         data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
-        print(data)
         user = db_instance.get_user_by_sub(data["sub"])
-        print(user.phone_number)
         if user:
             user_data = {
                 "id": user.id,
@@ -224,7 +218,6 @@ def get_user():
                 "profile_picture": user.profile_picture,
                 "is_admin": user.is_admin,
             }
-            print(user_data)
             return jsonify(user_data)
         else:
             return jsonify({"error": "User not found"}), 404
@@ -242,7 +235,6 @@ def user_search(user_id):
         return jsonify({"error": "Not logged in or invalid token"}), 401
 
     try:
-        print(user_id)
         seller = db_instance.get_user_by_id(user_id)
         if seller:
             user_data = {
@@ -254,7 +246,6 @@ def user_search(user_id):
                 "profile_picture": seller.profile_picture,
                 "is_admin": seller.is_admin,
             }
-            print(user_data)
             # if user.id != seller.id:
             #     send_email(
             #         seller.email,
@@ -412,7 +403,6 @@ def update_product(product_id):
     if not user.is_admin and user.id != item.seller_id:
         return jsonify({"error": "Unauthorized"}), 403
     data = request.json
-    print(data)
     try:
         db_instance.update_item(product_id, data)
         return jsonify({"message": "Listing updated"}), 200
