@@ -67,11 +67,12 @@ export default function HomePage() {
         <div className="mx-auto w-20 h-[2.5px] bg-gray-800 mb-8"></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-6xl mx-auto">
           {[
-            { image: "/furniture.png", title: "FURNITURE" },
-            { image: "/clothing.jpg", title: "CLOTHES" },
-            { image: "/appliances.jpg", title: "APPLIANCES" },
-            { image: "/essentials.jpg", title: "ESSENTIALS" },
+            { image: "/furniture.png", title: "FURNITURE", href: "./homegoods" },
+            { image: "/clothing.jpg", title: "CLOTHES", href: "./clothes" },
+            { image: "/appliances.jpg", title: "APPLIANCES", href: "./homegoods" },
+            { image: "/essentials.jpg", title: "ESSENTIALS", href: "./homegoods" },
           ].map((item, i) => (
+            <Link key={i} href={item.href}>
             <motion.div
               key={i}
               className="relative group h-[300px] w-full rounded-md overflow-hidden shadow-md"
@@ -97,6 +98,7 @@ export default function HomePage() {
                 </h3>
               </div>
             </motion.div>
+          </Link>
           ))}
         </div>
       </motion.section>
