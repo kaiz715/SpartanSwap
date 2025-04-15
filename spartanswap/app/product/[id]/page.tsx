@@ -23,4 +23,3 @@ export async function generateStaticParams() {
     { id: "6" },
   ];
 }
-/Users/jennyzhang/Documents/GitHub/CaseCycle/spartanswap/app/product/[id]/page.tsx
