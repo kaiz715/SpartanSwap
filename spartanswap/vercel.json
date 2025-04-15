@@ -1,8 +1,14 @@
 {
     "builds": [
       {
-        "src": "/spartanswap/package.json",
+        "src": "spartanswap/package.json",
         "use": "@vercel/next"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "spartanswap/$1"
       }
     ]
   }
