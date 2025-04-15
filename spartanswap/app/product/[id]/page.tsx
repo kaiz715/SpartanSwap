@@ -1,19 +1,19 @@
 // app/product/[id]/page.tsx
-// This file is a server component (do not use "use client" here).
+// This file is a Server Component (no "use client" at the top).
+
 import ProductDetailClient from "./ProductDetailClient";
 
-export default async function ProductPage({
-  params,
-}: {
+interface ProductPageProps {
   params: { id: string };
-}) {
-  // Await the params (even if it's not a real promise, this satisfies Next.js)
-  const resolvedParams = await Promise.resolve(params);
-  return <ProductDetailClient id={resolvedParams.id} />;
+}
+
+export default async function ProductPage({ params }: ProductPageProps) {
+  // Wrap params in a promise to satisfy Next.js's PageProps typing
+  const { id } = await Promise.resolve(params);
+  return <ProductDetailClient id={id} />;
 }
 
 export async function generateStaticParams() {
-  // Provide a few sample IDs for static export.
   return [
     { id: "1" },
     { id: "2" },
@@ -23,3 +23,4 @@ export async function generateStaticParams() {
     { id: "6" },
   ];
 }
+/Users/jennyzhang/Documents/GitHub/CaseCycle/spartanswap/app/product/[id]/page.tsx
