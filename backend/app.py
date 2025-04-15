@@ -157,7 +157,7 @@ with app.app_context():
     ) """
     
     # Then add the test item
-    db_instance.add_item(
+    """ db_instance.add_item(
         seller_id=1,  # Matches the test user's ID
         item_type="Furniture",
         category="Home Goods",
@@ -168,7 +168,7 @@ with app.app_context():
         orders=24,
         description="Test description",
         is_custom=True
-    )
+    ) """
 
 
 @app.route("/api/products", methods=["GET"])
@@ -275,6 +275,7 @@ def update_user():
         user.name = profile_data.get("name", user.name)
         user.gender = profile_data.get("gender", user.gender)
         user.phone_number = profile_data.get("phoneNumber", user.phone_number)  # Note: phoneNumber vs phone_number
+
         user.profile_picture = profile_data.get("profile_picture", user.profile_picture)
 
         # Explicitly add to session and commit
