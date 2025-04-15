@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { Heart, X } from "lucide-react";
 import { useFavorites } from "@/app/components/FavoritesContext";
 import axios from "axios";
+import { useCookies } from "react-cookie";
 import Navbar from "@/app/components/Navbar";
 
 export interface Product {
@@ -25,7 +26,7 @@ export interface Product {
   isCustom?: boolean;
 }
 
-export default function ProductDetailClient({ id }: { id: string }) {
+export default function ProductDetailClient({ id: product_id }: { id: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
@@ -35,8 +36,46 @@ export default function ProductDetailClient({ id }: { id: string }) {
   const { favorites, toggleFavorite } = useFavorites();
   const [showFavorites, setShowFavorites] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [sellerID, setSellerID] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [cookies] = useCookies(["jwt_token"]);
+  const isLoggedIn = Boolean(cookies.jwt_token);
+
+
+  const [profilePicture, setProfilePicture] = useState("/profileIcon.png");
+  const [fullName, setFullName] = useState("");
+  const [gender, setGender] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [emailAddresses, setEmailAddresses] = useState<string[]>([]);
+  const [id, setId] = useState("");
 
   useEffect(() => {
+
+    const fetchProfile = async () => {
+      try {
+          const response = await axios.get(
+              "http://localhost:5001/api/user",
+              {
+                  withCredentials: true,
+              }
+          );
+          setFullName(response.data.name || "");
+          setGender(response.data.gender || "");
+          setPhoneNumber(response.data.phoneNumber || "");
+          setEmailAddresses(response.data.emailAddresses || []);
+          setId(response.data.id || "");
+          if (response.data.profile_picture) {
+              setProfilePicture(response.data.profile_picture);
+          }
+          if (response.data.is_admin) setIsAdmin(true);
+      } catch (error) {
+          console.error("Failed to load profile picture", error);
+      }
+  };
+  
+  if (isLoggedIn) {
+      fetchProfile();
+  }
     const fetchSellerInfo = async (sellerId: number) => {
       try {
         const resp = await axios.get(
@@ -55,11 +94,11 @@ export default function ProductDetailClient({ id }: { id: string }) {
     const listings = localStorage.getItem("listings");
     if (listings) {
       const arr: Product[] = JSON.parse(listings);
-      const found = arr.find((p) => p.id === Number(id)) || null;
+      const found = arr.find((p) => p.id === Number(product_id)) || null;
       setProduct(found);
       if (found) fetchSellerInfo(found.sellerId);
     }
-  }, [id]);
+  }, [product_id]);
 
   if (!product) {
     return (
@@ -89,6 +128,40 @@ export default function ProductDetailClient({ id }: { id: string }) {
     alert("Copied!");
   };
 
+  const handleDelete = async () => {
+    if (!product) return;
+    if (window.confirm("Are you sure you want to delete this listing?")) {
+        try {
+            const response = await axios.delete(
+                "http://localhost:5001/api/delete_listing",
+                {
+                    data: { product_id: product.id },
+                    withCredentials: true,
+                }
+            );
+            if (response.status === 200) {
+                // Remove from localStorage
+                const data = localStorage.getItem("listings");
+                if (data) {
+                    const listings: Product[] = JSON.parse(data);
+                    const updatedListings = listings.filter(
+                        (p) => p.id !== product.id
+                    );
+                    localStorage.setItem(
+                        "listings",
+                        JSON.stringify(updatedListings)
+                    );
+                }
+                // Redirect to home or category
+                window.location.href =
+                    categoryToUrl[product.category] || "/";
+            }
+        } catch (error) {
+            console.error("Error deleting listing:", error);
+            alert("Failed to delete listing. You may not have permission.");
+        }
+    }
+};
   return (
     <div className="bg-[#EAF5FA] min-h-screen relative">
       <Navbar />
@@ -178,6 +251,19 @@ export default function ProductDetailClient({ id }: { id: string }) {
             >
               Back to Listings
             </button>
+            {/* Delete Listings button */}
+
+            {(isAdmin || sellerID == product_id) && (
+                                <div className="mt-4">
+                                    {" "}
+                                    <button
+                                        onClick={handleDelete}
+                                        className="w-full bg-red-600 text-white px-3 py-3 rounded-lg font-semibold hover:bg-red-700 transition"
+                                    >
+                                        Delete Listing{" "}
+                                    </button>{" "}
+                                </div>
+                            )}
           </div>
         </div>
       </div>
