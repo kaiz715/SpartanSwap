@@ -157,6 +157,8 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
         price: [0, 300],
     });
 
+    
+
     const itemsPerPage = 9;
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -388,7 +390,7 @@ export default function ListingsPage({ currentCategory }: ListingsPageProps) {
                                         </p>
                                     </div>
                                     <motion.button
-                                        onClick={(e) => {
+                                        onClick={(e: { preventDefault: () => void; }) => {
                                             e.preventDefault();
                                             toggleFavorite(product);
                                         }}
