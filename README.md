@@ -1,3 +1,118 @@
+# SpartanSwap
+
+SpartanSwap is a web-based platform for students at Case Western Reserve University to trade, sell, or donate items easily and securely. It is composed of a Flask backend and a Next.js frontend, enabling user authentication, product listings, image uploads, and profile management.
+
+---
+
+## Project Structure
+
+```
+.
+├── backend
+│   ├── __pycache__
+│   ├── admin_list.py
+│   ├── app.py
+│   ├── database.py
+│   ├── db_class.py
+│   ├── db_demo_repl.py
+│   ├── email_sender.py
+│   ├── environment.py
+│   ├── instance
+│   ├── README.md
+│   ├── requirements.txt
+│   ├── seed.py
+│   ├── spartanswap.db
+│   └── uploads
+├── spartanswap
+│   ├── app
+│   ├── eslint.config.mjs
+│   ├── globals.d.ts
+│   ├── helper.py
+│   ├── next-env.d.ts
+│   ├── next.config.ts
+│   ├── node_modules
+│   ├── out
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── postcss.config.mjs
+│   ├── public
+│   ├── README.md
+│   ├── tailwind.config.js
+│   ├── tailwind.config.ts
+│   └── tsconfig.json
+├── package-lock.json
+└── README.md
+```
+
+---
+
+## Key Features
+
+-   **Google OAuth**: Secure authentication via Google accounts.
+-   **JWT Authentication**: Stateless session validation for frontend-backend communication.
+-   **Item Listings**: Users can create, update, view, and delete listings.
+-   **User Profiles**: Profile data is fetched and stored on first login.
+-   **Image Uploads**: Images are hosted externally using imgbb.
+-   **Admin Tools**: Admin view provides additional controls over listings.
+
+---
+
+## Technology Stack
+
+-   **Frontend**: Next.js, Tailwind CSS
+-   **Backend**: Flask, SQLAlchemy, JWT, Google OAuth
+-   **Database**: SQLite (development)
+-   **Image Hosting**: imgbb API
+
+---
+
+## Setup Instructions
+
+### Backend
+
+1. Create a virtual environment:
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    ```
+
+2. Install dependencies:
+
+    ```bash
+    pip install -r backend/requirements.txt
+    ```
+
+3. Set up `.env` variables in `backend/environment.py` or use an `.env` file.
+
+4. Run the backend:
+    ```bash
+    cd backend
+    python app.py
+    ```
+
+### Frontend
+
+1. Navigate to the frontend directory:
+
+    ```bash
+    cd spartanswap
+    ```
+
+2. Install dependencies:
+
+    ```bash
+    npm install
+    ```
+
+3. Run the development server:
+    ```bash
+    npm run dev
+    ```
+
+---
+
 # SpartanSwap API Documentation
 
 A RESTful API for SpartanSwap, a web application that allows users at Case Western Reserve University to buy and sell items. This API includes secure authentication via Google OAuth, user profile management, item listings, and image uploads.
@@ -258,3 +373,27 @@ All endpoints return errors in the following format:
 -   This API uses JWTs stored in cookies for session management.
 -   Only users with `@case.edu` emails can sign in.
 -   Admin privileges are determined by inclusion in `admin_list`.
+
+## Testing
+
+This section outlines the test cases used to validate the SpartanSwap platform, which serves as a marketplace for CWRU students. The platform allows users to log in with their CWRU Google account, browse and search for items, and create listings to sell.
+
+Test cases were developed by Jenny Zhang, Kai Zheng, Willis Erdman, and Carmen Sendino Gutierrez. (Date: March 31, 2025)
+
+Each test case includes the objective, preconditions, steps to reproduce, expected results, and post-conditions.
+
+| Test Case ID | Objective                              | Precondition                                | Steps                                                             | Expected Result                              | Post-Condition                          |
+| ------------ | -------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------- | --------------------------------------- |
+| TC-01        | Users can sign in                      | User has a valid CWRU email                 | Click "Login with Google" and complete login                      | User receives JWT session cookie             | User stays on homepage, logged in       |
+| TC-02        | Non-CWRU users cannot sign in          | User does not have a CWRU email             | Click "Login with Google" and attempt login                       | JWT cookie states user is not CWRU validated | User remains on homepage, not logged in |
+| TC-03        | Unauthenticated users are redirected   | User not logged in                          | Access any non-homepage URL                                       | Redirect to homepage                         | User lands on homepage                  |
+| TC-04        | Users can add descriptions to listings | Logged-in user on item posting form         | Click "Create Listing", fill in form, add description, and submit | Listing saved with description visible       | Description visible to others           |
+| TC-05        | Users can add images to listings       | Logged-in user with local image file        | Click "Create Listing", select image file, and submit             | Image uploaded and linked to listing         | Image appears on listings page          |
+| TC-06        | Users can create listings              | Valid CWRU login                            | Click "Create Listing" and fill in details                        | Database updates with new listing            | Listing visible to other users          |
+| TC-07        | Users can view listings                | Logged-in user with access to listings page | Log in and open listings page                                     | Listings are fetched and displayed           | Listings are viewable by user           |
+| TC-08        | Users can modify listings              | Logged-in user owns the listing             | View user profile, click edit on own listing                      | Fields updated and saved to database         | Updated info displayed in listings      |
+| TC-09        | Users can get contact info             | Logged-in user                              | Click on a listing to view details                                | Contact info and profile displayed           | Static display of contact info          |
+| TC-10        | Users can favorite listings            | Logged-in user viewing listings             | Click heart icon on a listing                                     | Item added to favorites, heart turns red     | Item remains in favorites list          |
+| TC-11        | Users can remove favorites             | Listing already favorited                   | Click heart icon or 'X' in favorites tab                          | Item removed from favorites                  | Heart icon empties, item removed        |
+| TC-12        | Filter listings by type, color, price  | Logged-in user viewing listings             | Apply filters on listings page                                    | Filtered results shown                       | Filters remain active until cleared     |
+| TC-13        | Logo click returns to home             | User on any page                            | Click SpartanSwap logo                                            | Redirected to homepage                       | User lands on homepage                  |
