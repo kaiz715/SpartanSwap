@@ -60,7 +60,7 @@ SpartanSwap is a web-based platform for students at Case Western Reserve Univers
 
 ## Technology Stack
 
--   **Frontend**: Next.js, Tailwind CSS
+-   **Frontend**: Next.js, Tailwind CSS, React Components
 -   **Backend**: Flask, SQLAlchemy, JWT, Google OAuth
 -   **Database**: SQLite (development)
 -   **Image Hosting**: imgbb API
