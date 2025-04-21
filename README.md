@@ -382,6 +382,8 @@ Test cases were developed by Jenny Zhang, Kai Zheng, Willis Erdman, and Carmen S
 
 Each test case includes the objective, preconditions, steps to reproduce, expected results, and post-conditions.
 
+Backend test cases are located in backend/SpartanSwap.postman_collection.json
+
 | Test Case ID | Objective                              | Precondition                                | Steps                                                             | Expected Result                              | Post-Condition                          |
 | ------------ | -------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------- | --------------------------------------- |
 | TC-01        | Users can sign in                      | User has a valid CWRU email                 | Click "Login with Google" and complete login                      | User receives JWT session cookie             | User stays on homepage, logged in       |
