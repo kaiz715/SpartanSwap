@@ -2,6 +2,7 @@
 # feb 26, 2025
 # v 0.0.1
 
+"""Database management module for SpartanSwap application."""
 
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
@@ -10,15 +11,17 @@ from flask import Flask
 
 
 class DBClass:
+    """Class to handle all database operations using SQLAlchemy."""
     db = SQLAlchemy()
 
     def __init__(self, app):
+        """Initialize the database with the given Flask app."""
         self.app = app
         self.db.init_app(app)
 
     @classmethod
     def create_new(cls):
-        """Method for initializing the database"""
+        """Create a new instance of the database."""
         app = Flask(__name__)
         app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///spartanswap.db"
         app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -33,7 +36,7 @@ class DBClass:
         
 
     def add_user(self, sub, email, name, profile_picture=None, gender=None, phone_number=None, is_admin=False):
-        """Method to add a user to the database"""
+        """Add a new user to the database."""
         with self.app.app_context():
             new_user = User(
                 sub=sub,
@@ -49,14 +52,14 @@ class DBClass:
             print(f"Usuario {name} agregado correctamente.")
         
     def get_user_by_sub(self, sub):
-        """Method to retrieve a user by sub from the database"""
+        """Retrieve a user by their Google sub ID."""
         with self.app.app_context():
             user = User.query.filter_by(sub=sub).first()
             #print(type(user))
             return user
     
     def get_user_by_id(self, user_id):
-        """Method to retrieve a user by ID from the database"""
+        """Retrieve a user by their database ID."""
         with self.app.app_context():
             user = User.query.filter_by(id=user_id).first()
             return user
@@ -75,7 +78,7 @@ class DBClass:
         description=None,
         is_custom=False,
     ):
-        """Method to add an item to the database"""
+        """Add a new item listing to the database."""
         with self.app.app_context():
             new_item = Item(
                 seller_id=seller_id,
@@ -95,7 +98,7 @@ class DBClass:
             print(f"Ítem {name} agregado correctamente.")
             
     def delete_item(self, item_id):
-        """Method to delete an item from the database"""
+        """Delete an item listing from the database."""
         with self.app.app_context():
             item = Item.query.get(item_id)
             if item:
@@ -108,7 +111,7 @@ class DBClass:
                 return False
 
     def get_all_items(self, category=None, seller_id=None):
-        """Method to retrieve items from the database, optionally filtered by category"""
+        """Retrieve all items, optionally filtered by category or seller."""
         with self.app.app_context():
             query = Item.query
             if category:
@@ -119,7 +122,7 @@ class DBClass:
             return items
         
     def get_items_by_id(self, item_id):
-        """Method to retrieve an item by ID from the database"""
+        """Retrieve an item by its ID."""
         with self.app.app_context():
             item = Item.query.filter_by(id=item_id).first()
             return item
@@ -166,11 +169,12 @@ class DBClass:
             return item
 
 
-
+# Database object for app
 db = DBClass.db
 
 
 class User(db.Model):
+    """Model representing a user in the database."""
     id = db.Column(db.Integer, primary_key=True)
     sub = db.Column(db.String(100), unique=True, nullable=False)
     profile_picture = db.Column(db.String(255), nullable=True)
@@ -185,6 +189,7 @@ class User(db.Model):
 
 
 class Item(db.Model):
+    """Model representing an item listing in the database."""
     __tablename__ = "item"
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
