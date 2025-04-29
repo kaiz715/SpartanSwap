@@ -44,6 +44,15 @@ with app.app_context():
 # client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 def validate_session(token, is_admin=False):
+    #docstring
+    """
+    Validate the session token and check if the user is an admin.
+    Args:
+        token (str): The JWT token to validate.
+        is_admin (bool): Flag to check if the user is an admin.
+    Returns:
+        dict: User data if valid, False otherwise.
+    """
     try:
         data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
         user = db_instance.get_user_by_sub(data["sub"])
@@ -72,6 +81,13 @@ def validate_session(token, is_admin=False):
 
 @app.route("/validate", methods=["GET"])
 def validate():
+    # docstring
+    """
+    Validate the session token and check if the user is logged in.
+    Returns:
+        Response: JSON response indicating whether the user is logged in or not.
+    """
+
     token = request.cookies.get("jwt_token")
     if not token:
         return jsonify({"error": "Not logged in"}), 401
@@ -86,6 +102,13 @@ def validate():
 
 @app.route("/signin", methods=["POST"])
 def signin():
+    # docstring
+    """
+    Sign in the user using Google OAuth 2.0.
+    Returns:
+        Response: JSON response containing the JWT token and validation status.
+    """
+
     try:
         token = request.form["credential"]
         idinfo = id_token.verify_oauth2_token(
@@ -173,6 +196,13 @@ with app.app_context():
 
 @app.route("/api/products", methods=["GET"])
 def get_products():
+    # docstring
+    """
+    Get all products based on seller ID or category.
+    Returns:
+        Response: JSON response containing the list of products.
+    """
+
     seller_id = request.args.get("sellerId")
     if seller_id:
         items = db_instance.get_all_items(seller_id=seller_id)
@@ -200,6 +230,13 @@ def get_products():
 
 @app.route("/api/user", methods=["GET"])
 def get_user():
+    # docstring
+    """
+    Get user information based on the JWT token.
+    Returns:
+        Response: JSON response containing the user information.
+    """
+
     token = request.cookies.get("jwt_token")
     #print(token)
     if not token:
@@ -228,6 +265,15 @@ def get_user():
 
 @app.route("/api/user_search/<int:user_id>", methods=["GET"])
 def user_search(user_id):
+    # docstring
+    """
+    Get user information based on the user ID.
+    Args:
+        user_id (int): The ID of the user to search for.
+    Returns:
+        Response: JSON response containing the user information.
+    """
+
     token = request.cookies.get("jwt_token")
     user = validate_session(token)
     
@@ -262,6 +308,13 @@ def user_search(user_id):
 
 @app.route("/api/user", methods=["PUT"])
 def update_user():
+    # docstring
+    """
+    Update user information based on the JWT token.
+    Returns:
+        Response: JSON response indicating the success or failure of the update.
+    """
+
     token = request.cookies.get("jwt_token")
     user = validate_session(token)
     
@@ -291,6 +344,13 @@ def update_user():
     
 @app.route("/api/add_listing", methods=["PUT"])
 def add_listing():
+    # docstring
+    """
+    Add a new listing to the database.
+    Returns:
+        Response: JSON response indicating the success or failure of the addition.
+    """
+
     token = request.cookies.get("jwt_token")
     user = validate_session(token)
     
@@ -323,6 +383,13 @@ def add_listing():
     
 @app.route("/api/delete_listing", methods=["DELETE"])
 def delete_listing():
+    # docstring
+    """
+    Delete a listing from the database.
+    Returns:
+        Response: JSON response indicating the success or failure of the deletion.
+    """
+
     token = request.cookies.get("jwt_token")
     user = validate_session(token)
     
@@ -351,6 +418,13 @@ def delete_listing():
 
 @app.route("/api/upload-profile-photo", methods=["POST"])
 def upload_profile_photo():
+    # docstring
+    """
+    Upload a profile photo to imgbb and return the URL.
+    Returns:
+        Response: JSON response containing the URL of the uploaded image.
+    """
+
     file = request.files.get("image")
     if not file:
         return jsonify({"error": "No file provided"}), 400
@@ -371,6 +445,13 @@ def upload_profile_photo():
     
 @app.route("/api/upload-listing-photo", methods=["POST"])
 def upload_listing_photo():
+    # docstring
+    """
+    Upload a listing photo to imgbb and return the URL.
+    Returns:
+        Response: JSON response containing the URL of the uploaded image.
+    """
+
     file = request.files.get("image")
     if not file:
         return jsonify({"error": "No file provided"}), 400
@@ -391,6 +472,15 @@ def upload_listing_photo():
     
 @app.route("/api/products/<int:product_id>", methods=["PUT"])
 def update_product(product_id):
+    # docstring
+    """
+    Update a product listing in the database.
+    Args:
+        product_id (int): The ID of the product to update.
+    Returns:
+        Response: JSON response indicating the success or failure of the update.
+    """
+
     token = request.cookies.get("jwt_token")
     user = validate_session(token)
     if not user:
