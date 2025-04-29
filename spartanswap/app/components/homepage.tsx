@@ -1,3 +1,26 @@
+/**
+ * HomePage Component
+ * 
+ * Renders the landing page of the SpartanSwap application.
+ * 
+ * Features:
+ * - Displays a Navbar at the top for site navigation.
+ * - Hero section featuring the site's motto, a "Shop Now" button, and a homepage image.
+ * - Highlights section showcasing featured product categories with animated hover effects.
+ * - Info/Features section highlighting platform benefits (eco-friendly, student-verified, no shipping fees).
+ * 
+ * Uses:
+ * - Framer Motion for smooth animations and transitions.
+ * - Next.js Image and Link components for optimized images and routing.
+ * 
+ * Responsive Design:
+ * - Mobile-first layout that adapts from a stacked column to side-by-side layout on larger screens.
+ * 
+ * Notes:
+ * - Images and category links are statically defined within the component.
+ * - Animations are set to play once when the section enters the viewport.
+ */
+
 "use client";
 
 import React from "react";

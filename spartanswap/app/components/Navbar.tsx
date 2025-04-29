@@ -1,3 +1,34 @@
+/**
+ * Navbar Component
+ * 
+ * Displays the navigation bar for the SpartanSwap application.
+ * 
+ * Features:
+ * - Left: SpartanSwap logo linking to the homepage.
+ * - Center: Navigation links for Home, Home Goods, Clothes, Rental, and Tickets.
+ * - Right: 
+ *   - "Create Listing" button (opens a modal for adding a new listing).
+ *   - Sign In button (opens a Google sign-in modal) if not logged in.
+ *   - Profile picture linking to the user's profile page if logged in.
+ * 
+ * Additional Functionalities:
+ * - Fetches and displays user's profile information (name, profile picture) if logged in.
+ * - Supports uploading and previewing an image when creating a new listing.
+ * - Saves newly created listings to localStorage and backend via API.
+ * - Responsive design with cleaner navigation for different screen sizes.
+ * - Smooth transitions using Framer Motion animations.
+ * 
+ * Technologies Used:
+ * - Next.js Link and Image components for routing and image optimization.
+ * - React-cookie for managing authentication state.
+ * - Axios for API communication.
+ * - Framer Motion for animation effects.
+ * 
+ * Notes:
+ * - Listings trigger a local event ("listingsUpdated") after creation for real-time updates.
+ * - Category type is automatically detected based on the current page path.
+ */
+
 "use client";
 
 import Link from "next/link";

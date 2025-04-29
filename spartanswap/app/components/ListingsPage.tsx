@@ -1,3 +1,37 @@
+/**
+ * ListingsPage Component
+ * 
+ * Displays a dynamic, filterable, and paginated list of products for a given category.
+ * 
+ * Features:
+ * - Fetches product data from a backend API based on the current category.
+ * - Supports client-side filtering by color, type, and price range.
+ * - Provides pagination for large product lists (9 products per page).
+ * - Integrates favorites functionality, allowing users to save and view favorite items.
+ * - Includes a floating "Favorites" button and a favorites sidebar for quick access.
+ * 
+ * Technologies Used:
+ * - Framer Motion for smooth animations.
+ * - Next.js Image and Link components for optimized routing and asset management.
+ * - Lucide-react icons (ChevronLeft, ChevronRight, Heart, X).
+ * - FavoritesContext for managing favorited products globally.
+ * 
+ * Responsive Design:
+ * - Adapts grid layout for different screen sizes (1-column on mobile, up to 3-columns on desktop).
+ * 
+ * Notes:
+ * - Filters and listings update automatically when the category or filter options change.
+ * - Handles loading states and fetch errors gracefully.
+ * 
+ * Props:
+ * - currentCategory: string — category to filter products initially.
+ * 
+ * Example Usage:
+ * ```tsx
+ * <ListingsPage currentCategory="Clothes" />
+ * ```
+ */
+
 "use client";
 
 import React, { useState, useEffect, ChangeEvent } from "react";

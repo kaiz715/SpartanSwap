@@ -1,3 +1,26 @@
+/**
+ * Favorites Context
+ * 
+ * Provides global state management for favorited products across the application.
+ * 
+ * - Defines a Product interface for favorite items (can be reused elsewhere).
+ * - Creates a FavoritesContext to hold:
+ *   - The current list of favorited products.
+ *   - A function to toggle a product's favorite status.
+ * 
+ * - The FavoritesProvider:
+ *   - Loads favorites from localStorage on initial mount.
+ *   - Saves updates to favorites back to localStorage whenever the favorites list changes.
+ *   - Provides favorites data and toggleFavorite function to all child components.
+ * 
+ * - The useFavorites hook:
+ *   - Grants easy access to the favorites context.
+ *   - Ensures it is only called within a valid FavoritesProvider.
+ * 
+ * Usage:
+ * Wrap your app (or specific pages) with <FavoritesProvider> to enable favorites functionality.
+ */
+
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";

@@ -1,3 +1,33 @@
+/**
+ * ProfilePage Component
+ * 
+ * Provides users with the ability to view and manage their profile information and their active product listings.
+ * 
+ * Features:
+ * - Loads and displays user profile data (name, gender, phone, email, profile photo).
+ * - Allows updating and saving profile details, including uploading a new profile photo.
+ * - Supports tabbed navigation between:
+ *   - "Profile" view: Edit personal info.
+ *   - "Listings" view: View, edit, or delete personal product listings.
+ * - Provides functionality to:
+ *   - Create a new profile photo.
+ *   - Save updated profile data via an API call.
+ *   - Sign out (removing JWT cookie and redirecting to home).
+ *   - Edit or delete individual listings through modals.
+ * 
+ * Technologies Used:
+ * - React hooks (`useState`, `useEffect`) for local state and lifecycle handling.
+ * - Axios for communication with the backend API.
+ * - Next.js Link, Image, Router for navigation and media optimization.
+ * - react-cookie for managing authentication tokens.
+ * 
+ * Notes:
+ * - Listings are dynamically fetched based on the logged-in user's seller ID.
+ * - Authentication is required; otherwise, a "Not Logged In" screen is displayed.
+ * - Suppresses hydration warnings to prevent SSR/CSR mismatch issues on reload.
+ * - A separate `EditModal` component is used for updating listing details.
+ */
+
 // app/profile/page.tsx
 "use client";
 

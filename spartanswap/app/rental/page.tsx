@@ -1,3 +1,24 @@
+/**
+ * RentalPage Component
+ * 
+ * Displays the ListingsPage filtered to the "Rental" category.
+ * 
+ * Features:
+ * - Checks if the user is authenticated by verifying the "jwt_token" cookie.
+ * - On mount, attempts to fetch the user's profile from the backend to confirm the session.
+ *   - If fetching fails or returns an error, the user is treated as logged out and the token is removed.
+ * - If not logged in, displays a prompt to return to the home page.
+ * - If logged in, renders the ListingsPage component for rental listings.
+ * 
+ * Technologies Used:
+ * - react-cookie for cookie management and authentication check.
+ * - axios for backend API requests.
+ * - Next.js Link component for client-side navigation.
+ * 
+ * Notes:
+ * - Uses a local `isLoggedIn` variable, but does not fully leverage React state for reactive updates if the cookie changes dynamically.
+ */
+
 "use client";
 import ListingsPage from "@/app/components/ListingsPage";
 import { useCookies } from "react-cookie";

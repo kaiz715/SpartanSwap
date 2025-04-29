@@ -1,3 +1,21 @@
+/**
+ * HomeGoodsPage Component
+ * 
+ * Renders the ListingsPage for the "Home Goods" category.
+ * 
+ * Features:
+ * - Checks if the user is authenticated by verifying the "jwt_token" cookie.
+ * - On component mount, tries to load the user's profile from the backend.
+ *   - If the token is invalid, removes the token and treats the user as logged out.
+ * - If the user is not logged in, displays a message with a button linking back to the homepage.
+ * - If the user is authenticated, displays the ListingsPage filtered to "Home Goods" products.
+ * 
+ * Technologies Used:
+ * - react-cookie for cookie management.
+ * - axios for HTTP API requests.
+ * - Next.js Link component for navigation.
+ */
+
 "use client";
 import ListingsPage from "@/app/components/ListingsPage";
 import { useCookies } from "react-cookie";

@@ -1,3 +1,24 @@
+/**
+ * TicketsPage Component
+ * 
+ * Displays the ListingsPage filtered to the "Tickets" category.
+ * 
+ * Features:
+ * - Checks for a valid "jwt_token" cookie to determine if the user is authenticated.
+ * - On mount, attempts to fetch the user's profile from the backend:
+ *   - If the token is invalid or an error occurs, removes the cookie and logs the user out.
+ * - If the user is not logged in, displays a prompt to return to the home page.
+ * - If authenticated, shows the ListingsPage for ticket listings.
+ * 
+ * Technologies Used:
+ * - react-cookie for managing cookies and authentication.
+ * - axios for making HTTP requests to the backend.
+ * - Next.js Link component for smooth client-side navigation.
+ * 
+ * Notes:
+ * - `isLoggedIn` is currently a local variable and does not automatically trigger a re-render if cookies change.
+ */
+
 "use client";
 import ListingsPage from "@/app/components/ListingsPage";
 import { useCookies } from "react-cookie";

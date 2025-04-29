@@ -1,3 +1,21 @@
+/**
+ * ClothesPage Component
+ * 
+ * Renders the listings page for the "Clothes" category.
+ * 
+ * - Checks if the user is logged in by verifying the "jwt_token" cookie.
+ * - On component mount, attempts to load the user profile via an API call.
+ *   - If the profile fetch fails, removes the invalid token and marks the user as logged out.
+ * - If the user is not logged in, displays a message with a button to return home.
+ * - If the user is authenticated, renders the ListingsPage component for Clothes.
+ * 
+ * Dependencies:
+ * - react-cookie for managing cookies
+ * - axios for HTTP requests
+ * - next/link for client-side navigation
+ */
+
+
 "use client";
 import ListingsPage from "@/app/components/ListingsPage";
 import { useCookies } from "react-cookie";

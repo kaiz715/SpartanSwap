@@ -1,3 +1,34 @@
+/**
+ * ProductDetailClient Component
+ * 
+ * Client-side component for displaying the details of a single product listing.
+ * 
+ * Features:
+ * - Fetches and displays product information based on the `product_id` from localStorage.
+ * - Fetches the seller's information (name, email, phone) via an API call.
+ * - Displays product attributes: image, name, price, color, type, description.
+ * - Allows users to:
+ *   - Favorite/unfavorite the product.
+ *   - Contact the seller through a modal (with a "copy email" feature).
+ *   - Delete the listing if the user is an admin or the seller.
+ * - Displays a floating button to open/close a favorites sidebar.
+ * - Provides a "Back to Listings" button for navigation.
+ * 
+ * Technologies Used:
+ * - React hooks (`useState`, `useEffect`) for state management and data fetching.
+ * - Next.js `Image`, `Link`, `useRouter`, and `usePathname` for routing and assets.
+ * - Axios for API communication.
+ * - Framer Motion for animations (e.g., floating buttons, modals).
+ * - react-cookie for cookie-based authentication check.
+ * - FavoritesContext for managing the global favorites list.
+ * 
+ * Notes:
+ * - Product data is currently retrieved from `localStorage` and synced with the backend API.
+ * - Seller information is dynamically loaded on component mount.
+ * - Deleting a listing updates localStorage and calls a backend API to delete server-side data.
+ * - Displays appropriate error handling for missing products and failed operations.
+ */
+
 // app/components/ProductDetailClient.tsx
 "use client";
 

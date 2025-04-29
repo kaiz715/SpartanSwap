@@ -1,3 +1,26 @@
+/**
+ * SignInWithGoogle Component
+ * 
+ * Provides Google OAuth 2.0 login functionality integrated with CWRU email verification.
+ * 
+ * Features:
+ * - Renders the Google Sign-In button using Google's Identity Services client library.
+ * - Defines a global `signIn` function to handle the Google credential response:
+ *   - Sends the credential to the backend for verification.
+ *   - If valid and a CWRU email, stores the JWT token in cookies.
+ *   - If invalid (non-CWRU email), displays an error message.
+ * - Displays a loading state during authentication (although it's not fully tied to async behavior yet).
+ * 
+ * Technologies Used:
+ * - React-cookie for handling JWT token storage in cookies.
+ * - Axios for communicating with the backend authentication API.
+ * - Google Identity Services for rendering and managing OAuth flow.
+ * 
+ * Notes:
+ * - Backend must validate the user's email domain to ensure they are a CWRU student.
+ * - The Google script is embedded directly inside the component.
+ */
+
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { CookiesProvider, useCookies } from "react-cookie";
