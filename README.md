@@ -397,3 +397,44 @@ Each test case includes the objective, preconditions, steps to reproduce, expect
 | TC-11        | Users can remove favorites             | Listing already favorited                   | Click heart icon or 'X' in favorites tab                          | Item removed from favorites                  | Heart icon empties, item removed        |
 | TC-12        | Filter listings by type, color, price  | Logged-in user viewing listings             | Apply filters on listings page                                    | Filtered results shown                       | Filters remain active until cleared     |
 | TC-13        | Logo click returns to home             | User on any page                            | Click SpartanSwap logo                                            | Redirected to homepage                       | User lands on homepage                  |
+
+
+## Development Retrospective: Areas for Improvement
+
+While SpartanSwap successfully provides a platform for CWRU students to sell items, there are several areas where the project could have been improved:
+
+- Although we implemented test cases for core functionalities, additional automated testing for edge cases and error handling, especially in the database could have improved reliability.
+
+- The image hosting solution (imgbb) is functional but could be replaced with a more scalable and cost-effective solution like AWS S3.
+
+- We spent a lot of time getting the log in with google working, and could have allocated more time toward the core functionalities and features, rather than being slowed down by security. We understand security is very important if we were to deploy this though.
+
+- Some planned features, such as a bidding system, were deprioritized due to time constraints. Better time management or a phased development approach could have allowed us to include these features.
+
+## License
+
+MIT License
+
+```
+MIT License
+
+Copyright (c) 2025 SpartanSwap
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
