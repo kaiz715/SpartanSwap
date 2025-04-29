@@ -376,13 +376,11 @@ All endpoints return errors in the following format:
 
 ## Testing
 
-This section outlines the frontend and overall test cases used to validate the SpartanSwap platform, which serves as a marketplace for CWRU students. The platform allows users to log in with their CWRU Google account, browse and search for items, and create listings to sell. Specific backend test cases are in backend/testing.md.
+This section outlines the frontend and overall test cases used to validate the SpartanSwap platform, which serves as a marketplace for CWRU students. The platform allows users to log in with their CWRU Google account, browse and search for items, and create listings to sell. Specific backend test cases are detailed in backend/testing.md and backend/SpartanSwap.postman_collection.json
 
 Test cases were developed by Jenny Zhang, Kai Zheng, Willis Erdman, and Carmen Sendino Gutierrez. (Date: March 31, 2025)
 
 Each test case includes the objective, preconditions, steps to reproduce, expected results, and post-conditions.
-
-Backend test cases are located in backend/SpartanSwap.postman_collection.json
 
 | Test Case ID | Objective                              | Precondition                                | Steps                                                             | Expected Result                              | Post-Condition                          |
 | ------------ | -------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------- | --------------------------------------- |
